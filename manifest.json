@@ -1,0 +1,15 @@
+{
+  "short_name": "Clyppy",
+  "name": "Clyppy - Gestor de Tareas",
+  "icons": [
+    {
+      "src": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/clipboard-check.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#231942",
+  "theme_color": "#231942",
+  "display": "standalone"
+}

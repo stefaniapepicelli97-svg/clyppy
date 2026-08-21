@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Clyppy</title>
+
+<meta name="theme-color" content="#231942">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Clyppy">
+<link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/clipboard-check.svg">
+<link rel="manifest" href="/manifest.json">
+
+<style>
+:root {
+  --v1: #231942;
+  --v2: #5E548E;
+  --v3: #9F86C0;
+  --v4: #BE95C4;
+  --v5: #E0B1CB;
+
+  --p-alta: #e63946;
+  --p-media: #f4a261;
+  --p-baja: #2a9d8f;
+
+  --t-trabajo: #5e548e;
+  --t-personal: #be95c4;
+  --t-f043: #e0b1cb;
+  --t-reunion: #457b9d;
+  --t-seguimiento: #2a9d8f;
+
+  --fondo: #f7f5fa;
+  --blanco: #ffffff;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); color: var(--v1); }
+
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 245px; background: var(--v1); color: white; padding: 24px 14px; z-index: 100; transition: transform .25s ease; }
+.sidebar.oculta { transform: translateX(-245px); }
+
+.logo { display: flex; align-items: center; gap: 12px; padding: 5px 12px 28px; font-family: Ebrima, "Segoe UI", sans-serif; font-size: 25px; font-weight: 700; }
+.clip { width: 27px; height: 43px; border: 5px solid var(--v5); border-radius: 14px; transform: rotate(8deg); display: inline-block; position: relative; }
+.clip::after { content: ''; position: absolute; width: 12px; height: 25px; border: 4px solid var(--v5); border-left: none; border-radius: 0 10px 10px 0; left: 7px; top: 5px; }
+
+.menu { display: flex; flex-direction: column; gap: 6px; }
+.menu button { width: 100%; border: none; background: transparent; color: #eee; padding: 14px 15px; border-radius: 10px; cursor: pointer; font-family: Gadugi, "Segoe UI", sans-serif; font-size: 15px; text-align: left; }
+.menu button:hover, .menu button.activo { background: var(--v2); }
+
+.toggleSidebar { position: fixed; left: 226px; top: 18px; width: 40px; height: 40px; border: none; border-radius: 50%; background: var(--v2); color: white; cursor: pointer; z-index: 200; font-size: 20px; transition: left .25s ease; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+.sidebar.oculta ~ .toggleSidebar { left: 12px; }
+
+.main { margin-left: 245px; min-height: 100vh; transition: margin-left .25s ease; padding-bottom: 30px; }
+.main.expandido { margin-left: 0; }
+
+.header { background: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--v5); }
+.headerIzda { display: flex; align-items: center; gap: 12px; margin-left: 35px; }
+.tituloHeader { font-family: Ebrima, "Segoe UI", sans-serif; font-size: 20px; font-weight: 700; }
+.fecha { color: var(--v2); font-size: 13px; }
+
+/* ESTILO ICONO DE CAMPANITA */
+.btnNotif { background: #f0ebf8; border: 1px solid var(--v5); font-size: 18px; cursor: pointer; padding: 8px 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--v1); transition: background .2s; }
+.btnNotif:hover { background: var(--v5); }
+.btnNotif svg { width: 18px; height: 18px; fill: currentColor; }
+
+.contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
+
+.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; }
+.numero { font-size: 26px; font-weight: bold; color: var(--v1); }
+.titulo { color: var(--v2); margin-top: 4px; font-size: 13px; }
+
+.buscador { margin-bottom: 20px; }
+.buscador input { width: 100%; padding: 14px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 16px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; }
+
+.formulario { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.formulario h2 { margin-top: 0; font-family: Ebrima, "Segoe UI", sans-serif; font-size: 20px; }
+.formulario label { display: block; margin-top: 14px; margin-bottom: 6px; font-weight: bold; font-size: 13px; }
+.formulario input, .formulario select { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; font-family: Gadugi, "Segoe UI", sans-serif; }
+.filaFormulario { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btnGuardar { width: 100%; margin-top: 20px; background: var(--v1); color: white; border: none; border-radius: 10px; padding: 14px; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+.tarea { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(35,25,66,.08); display: flex; flex-direction: column; gap: 12px; border-left: 6px solid var(--v4); cursor: pointer; }
+.tarea.p-alta { border-left-color: var(--p-alta); }
+.tarea.p-media { border-left-color: var(--p-media); }
+.tarea.p-baja { border-left-color: var(--p-baja); }
+
+.info { flex: 1; }
+.hora { font-size: 16px; font-weight: bold; color: var(--v2); }
+.nombre { font-size: 17px; font-weight: bold; margin: 4px 0; }
+.dotTipo { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.dot-trabajo { background: var(--t-trabajo); }
+.dot-personal { background: var(--t-personal); }
+.dot-f043 { background: var(--t-f043); }
+.dot-reunion { background: var(--t-reunion); }
+.dot-seguimiento { background: var(--t-seguimiento); }
+.detalle { color: var(--v2); font-size: 13px; }
+.fechaTarea { display: inline-block; margin-top: 6px; color: var(--v2); font-size: 12px; }
+.tagPospuesta { background: var(--v5); color: var(--v1); font-weight: bold; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-left: 6px; font-size: 11px; }
+
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; align-items: center; }
+.acciones button { border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: Gadugi, "Segoe UI", sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.hecho { background: var(--v2); color: white; }
+.posponer { background: var(--v5); color: var(--v1); }
+.manana { background: var(--v3); color: white; }
+.volver { background: var(--v2); color: white; }
+
+/* ESTILO DEL BOTÓN LÁPIZ CON ICONO VECTORIAL */
+.btnEditarAccion { 
+  background: #f0ebf8; 
+  color: var(--v1); 
+  border: 1px solid var(--v5); 
+  border-radius: 8px; 
+  padding: 10px; 
+  cursor: pointer; 
+  transition: background 0.2s;
+}
+.btnEditarAccion:hover { background: var(--v5); }
+.btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
+
+.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.calHeader h2 { margin: 0; font-size: 18px; font-family: Ebrima, "Segoe UI", sans-serif; }
+.calNav { display: flex; gap: 6px; }
+.calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
+.calGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.calDiaSemana { text-align: center; font-size: 11px; font-weight: bold; color: var(--v2); padding: 6px 0; }
+.calCelda { min-height: 75px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; }
+.calCelda.otroMes { opacity: .35; }
+.calCelda.hoy { border: 2px solid var(--v3); }
+.calNumero { font-size: 11px; font-weight: bold; margin-bottom: 3px; }
+.calTarea { display: block; padding: 4px 5px; margin-bottom: 3px; border-radius: 5px; background: var(--v5); color: var(--v1); font-size: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-left: 3px solid var(--v4); }
+.calTarea.completada { text-decoration: line-through; opacity: .55; }
+.calTarea.p-alta { border-left-color: var(--p-alta); }
+.calTarea.p-media { border-left-color: var(--p-media); }
+.calTarea.p-baja { border-left-color: var(--p-baja); }
+
+.modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
+.modalOverlay.activo { opacity: 1; pointer-events: auto; }
+.modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.modalHeader h3 { margin: 0; font-family: Ebrima, "Segoe UI", sans-serif; }
+.btnCloseModal { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--v2); }
+.modalBody label { display: block; margin-top: 10px; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
+.modalBody input, .modalBody select { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; }
+.modalFooter { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
+.btnEliminar { background: #e63946; color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: bold; }
+.btnGuardarModal { background: var(--v1); color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: bold; }
+
+.toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
+.toast.visible { opacity: 1; transform: translateY(0); }
+
+@media(max-width: 768px) {
+  .sidebar { transform: translateX(-245px); }
+  .sidebar.visibleMobile { transform: translateX(0); }
+  .main { margin-left: 0 !important; }
+  .toggleSidebar { left: 12px !important; }
+  .sidebar.visibleMobile ~ .toggleSidebar { left: 226px !important; }
+  .resumen { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .card { padding: 12px 6px; }
+  .numero { font-size: 22px; }
+  .titulo { font-size: 11px; }
+  .filaFormulario { grid-template-columns: 1fr; gap: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<aside id="sidebar" class="sidebar">
+  <div class="logo"><span class="clip"></span> Clyppy</div>
+  <div class="menu">
+    <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
+    <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
+    <button id="menuPospuestas" onclick="mostrarSeccion('pospuestas')">Pospuestas</button>
+    <button id="menuBuscar" onclick="mostrarSeccion('buscar')">Buscar tareas</button>
+    <button id="menuNueva" onclick="mostrarSeccion('nueva')">Nueva tarea</button>
+    <button id="menuCompletadas" onclick="mostrarSeccion('completadas')">Completadas</button>
+    <button id="menuHistorial" onclick="mostrarSeccion('historial')">Historial</button>
+  </div>
+</aside>
+
+<button id="toggleSidebar" class="toggleSidebar" onclick="toggleSidebar()" title="Menú">›</button>
+
+<main id="main" class="main">
+  <header class="header">
+    <div class="headerIzda">
+      <div class="tituloHeader" id="tituloHeader">Mis tareas</div>
+      <button id="btnNotif" class="btnNotif" onclick="toggleNotificaciones()" title="Notificaciones">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      </button>
+    </div>
+    <div class="fecha" id="fecha"></div>
+  </header>
+
+  <div class="contenedor">
+    <div class="resumen">
+      <div class="card"><div class="numero" id="total">0</div><div class="titulo">Pendientes</div></div>
+      <div class="card"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
+      <div class="card"><div class="numero" id="pospuestas">0</div><div class="titulo">Pospuestas</div></div>
+    </div>
+
+    <div id="buscador" class="buscador" style="display:none;">
+      <input id="inputBuscar" type="text" placeholder="Buscar tarea..." oninput="buscarTareas()">
+    </div>
+
+    <div id="formulario" class="formulario" style="display:none;">
+      <h2>Nueva tarea</h2>
+      <label>¿Qué tenés que hacer?</label>
+      <input id="nuevaTarea" type="text" placeholder="Ej: Revisar reporte F043">
+      <div class="filaFormulario">
+        <div><label>Fecha</label><input id="nuevaFecha" type="date"></div>
+        <div><label>Hora</label><input id="nuevaHora" type="time"></div>
+      </div>
+      <div class="filaFormulario">
+        <div>
+          <label>Tipo</label>
+          <select id="nuevoTipo">
+            <option>Personal</option><option>Trabajo</option><option>F043</option><option>Reunión</option><option>Seguimiento</option>
+          </select>
+        </div>
+        <div>
+          <label>Prioridad</label>
+          <select id="nuevaPrioridad">
+            <option>Baja</option><option selected>Media</option><option>Alta</option>
+          </select>
+        </div>
+      </div>
+      <div class="filaFormulario">
+        <div>
+          <label>Repetición</label>
+          <select id="nuevaRepeticion" onchange="toggleRepetirHasta()">
+            <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+          </select>
+        </div>
+        <div id="colRepetirHasta" style="display:none;">
+          <label>Repetir hasta (opcional)</label>
+          <input id="nuevaRepetirHasta" type="date">
+        </div>
+      </div>
+      <button class="btnGuardar" onclick="guardarNuevaTarea()">Guardar tarea</button>
+    </div>
+
+    <div id="calendario" class="calendario" style="display:none;">
+      <div class="calHeader">
+        <h2 id="calTitulo"></h2>
+        <div class="calNav">
+          <button onclick="cambiarMes(-1)">‹</button>
+          <button onclick="irAMesActual()">Hoy</button>
+          <button onclick="cambiarMes(1)">›</button>
+        </div>
+      </div>
+      <div id="calGrid" class="calGrid"></div>
+    </div>
+
+    <div id="historial" style="display:none;"></div>
+    <div id="lista"></div>
+  </div>
+</main>
+
+<div id="modalEditar" class="modalOverlay">
+  <div class="modal">
+    <div class="modalHeader">
+      <h3>Editar tarea</h3>
+      <button class="btnCloseModal" onclick="cerrarModalEditar()">✕</button>
+    </div>
+    <div class="modalBody">
+      <input type="hidden" id="editId">
+      <label>Tarea</label><input id="editTarea" type="text">
+      <div class="filaFormulario">
+        <div><label>Fecha</label><input id="editFecha" type="date"></div>
+        <div><label>Hora</label><input id="editHora" type="time"></div>
+      </div>
+      <div class="filaFormulario">
+        <div>
+          <label>Tipo</label>
+          <select id="editTipo">
+            <option>Personal</option><option>Trabajo</option><option>F043</option><option>Reunión</option><option>Seguimiento</option>
+          </select>
+        </div>
+        <div>
+          <label>Prioridad</label>
+          <select id="editPrioridad">
+            <option>Baja</option><option>Media</option><option>Alta</option>
+          </select>
+        </div>
+      </div>
+      <label>Repetición</label>
+      <select id="editRepeticion">
+        <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+      </select>
+    </div>
+    <div class="modalFooter">
+      <button class="btnEliminar" onclick="confirmarEliminarModal()">Eliminar</button>
+      <div>
+        <button class="btnEditarAccion" onclick="cerrarModalEditar()">Cancelar</button>
+        <button class="btnGuardarModal" onclick="guardarEdicionModal()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalConfirmar" class="modalOverlay">
+  <div class="modal" style="max-width: 380px;">
+    <div class="modalHeader"><h3>¿Eliminar tarea?</h3></div>
+    <div class="modalBody"><p style="margin: 5px 0; color: var(--v2);">Esta acción no se puede deshacer.</p></div>
+    <div class="modalFooter" style="justify-content: flex-end; gap: 10px;">
+      <button class="btnEditarAccion" onclick="cerrarModalConfirmar()">Cancelar</button>
+      <button class="btnEliminar" onclick="ejecutarEliminacion()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxs17vzxkhItnvcKdohbK7qQLYZjfNhG1ovwSdMI8kTWOuOV2sQpP_CnP8zq3KpFL8m/exec";
+
+let tareas = [];
+let seccionActual = 'hoy';
+let calendarioFecha = new Date();
+let notifPermiso = false;
+let notificadosMap = {};
+
+document.addEventListener('DOMContentLoaded', iniciar);
+
+function iniciar() {
+  mostrarFecha();
+  configurarFechaNueva();
+  comprobarNotificacionesIncapacidad();
+  cargarTareas();
+  registrarServiceWorker();
+
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('visibleMobile');
+    document.getElementById('toggleSidebar').textContent = '›';
+  }
+
+  setInterval(cargarTareas, 60000);
+  setInterval(revisarNotificaciones, 10000);
+}
+
+function registrarServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      self.addEventListener('install', e => self.skipWaiting());
+      self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(e => console.log('SW error:', e));
+  }
+}
+
+async function callGAS(action, params = {}) {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action, ...params })
+    });
+    return await response.json();
+  } catch (e) {
+    console.error("Error API:", e);
+    throw e;
+  }
+}
+
+function comprobarNotificacionesIncapacidad() {
+  if (!("Notification" in window)) {
+    document.getElementById('btnNotif').style.display = 'none';
+  } else if (Notification.permission === "granted") {
+    notifPermiso = true;
+    document.getElementById('btnNotif').style.background = 'var(--v5)';
+  }
+}
+
+function toggleNotificaciones() {
+  if (!("Notification" in window)) {
+    mostrarToastUI("Navegador sin soporte de notificaciones.");
+    return;
+  }
+
+  Notification.requestPermission().then(function(permission) {
+    if (permission === "granted") {
+      notifPermiso = true;
+      document.getElementById('btnNotif').style.background = 'var(--v5)';
+      mostrarToastUI("Notificaciones activadas.");
+    } else {
+      mostrarToastUI("Permiso denegado.");
+    }
+  });
+}
+
+function revisarNotificaciones() {
+  if (!notifPermiso) return;
+  
+  const ahora = new Date();
+  const hoyStr = obtenerHoyKey();
+  const horaActualStr = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
+
+  tareas.forEach(function(t) {
+    if (t.estado === 'Completada') return;
+    
+    if (t.fechaKey === hoyStr && t.hora === horaActualStr) {
+      if (!notificadosMap[t.id]) {
+        notificadosMap[t.id] = true;
+
+        if ("Notification" in window && Notification.permission === "granted") {
+          const opciones = {
+            body: `${t.tarea} (${t.tipo || 'General'})`,
+            requireInteraction: true,
+            silent: false
+          };
+          
+          try {
+            new Notification("Clyppy - Tarea pendiente", opciones);
+          } catch (e) {
+            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+              navigator.serviceWorker.ready.then(reg => reg.showNotification("Clyppy - Tarea pendiente", opciones));
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const boton = document.getElementById('toggleSidebar');
+
+  if (window.innerWidth <= 768) {
+    sidebar.classList.toggle('visibleMobile');
+    boton.textContent = sidebar.classList.contains('visibleMobile') ? '‹' : '›';
+  } else {
+    sidebar.classList.toggle('oculta');
+    document.getElementById('main').classList.toggle('expandido');
+    boton.textContent = sidebar.classList.contains('oculta') ? '›' : '‹';
+  }
+}
+
+function mostrarFecha() {
+  const ahora = new Date();
+  document.getElementById('fecha').textContent = ahora.toLocaleDateString(
+    'es-AR', { weekday: 'short', day: 'numeric', month: 'short' }
+  );
+}
+
+function configurarFechaNueva() {
+  document.getElementById('nuevaFecha').value = obtenerHoyKey();
+}
+
+function obtenerHoyKey() {
+  const ahora = new Date();
+  return [
+    ahora.getFullYear(),
+    String(ahora.getMonth() + 1).padStart(2, '0'),
+    String(ahora.getDate()).padStart(2, '0')
+  ].join('-');
+}
+
+function toggleRepetirHasta() {
+  const rep = document.getElementById('nuevaRepeticion').value;
+  document.getElementById('colRepetirHasta').style.display = (rep !== 'Una vez') ? 'block' : 'none';
+}
+
+async function cargarTareas() {
+  try {
+    const res = await fetch(API_URL);
+    const datos = await res.json();
+    tareas = Array.isArray(datos) ? datos : [];
+    actualizarUI();
+  } catch (e) {
+    console.error("Error al cargar:", e);
+  }
+}
+
+function actualizarUI() {
+  actualizarContadores();
+  if (seccionActual === 'calendario') renderizarCalendario();
+  else if (seccionActual === 'buscar') buscarTareas();
+  else if (seccionActual === 'historial') cargarHistorial();
+  else if (seccionActual !== 'nueva') renderizarSegunSeccion();
+}
+
+function actualizarContadores() {
+  const hoy = obtenerHoyKey();
+  const ahora = Date.now();
+
+  // Las tareas de HOY no desaparecen del total de hoy aunque estén pospuestas unas horas
+  const pendientesHoy = tareas.filter(t => t.estado !== 'Completada' && t.fechaKey === hoy);
+  const pospuestas = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
+  const urgentesHoy = pendientesHoy.filter(t => String(t.prioridad || '').toLowerCase().includes('alta'));
+
+  document.getElementById('total').textContent = pendientesHoy.length;
+  document.getElementById('urgentes').textContent = urgentesHoy.length;
+  document.getElementById('pospuestas').textContent = pospuestas.length;
+}
+
+function mostrarSeccion(seccion) {
+  seccionActual = seccion;
+  document.querySelectorAll('.menu button').forEach(b => b.classList.remove('activo'));
+
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('visibleMobile');
+    document.getElementById('toggleSidebar').textContent = '›';
+  }
+
+  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', pospuestas: 'menuPospuestas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', historial: 'menuHistorial' };
+  if (mapa[seccion]) document.getElementById(mapa[seccion]).classList.add('activo');
+
+  document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
+  document.getElementById('formulario').style.display = seccion === 'nueva' ? 'block' : 'none';
+  document.getElementById('calendario').style.display = seccion === 'calendario' ? 'block' : 'none';
+  document.getElementById('historial').style.display = seccion === 'historial' ? 'block' : 'none';
+
+  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', pospuestas: 'Pospuestas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', historial: 'Historial' };
+  document.getElementById('tituloHeader').textContent = titulos[seccion];
+
+  if (seccion === 'calendario') renderizarCalendario();
+  else if (seccion === 'historial') { document.getElementById('lista').innerHTML = ''; cargarHistorial(); }
+  else if (seccion === 'nueva') { document.getElementById('lista').innerHTML = ''; }
+  else renderizarSegunSeccion();
+}
+
+function renderizarSegunSeccion() {
+  const ahora = Date.now();
+  const hoy = obtenerHoyKey();
+  let lista = [];
+
+  if (seccionActual === 'hoy') {
+    // Permanece visible en HOY mostrando etiqueta de pospuesta si corresponde
+    lista = tareas.filter(t => t.estado !== 'Completada' && t.fechaKey === hoy);
+  } else if (seccionActual === 'pospuestas') {
+    lista = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
+  } else if (seccionActual === 'completadas') {
+    lista = tareas.filter(t => t.estado === 'Completada');
+  }
+
+  lista.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || '')));
+  renderizar(lista);
+}
+
+function renderizar(lista) {
+  const contenedor = document.getElementById('lista');
+  if (!lista || lista.length === 0) {
+    let mensaje = 'No tenés tareas pendientes.';
+    if (seccionActual === 'pospuestas') mensaje = 'No tenés tareas pospuestas.';
+    if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
+    contenedor.innerHTML = `<div class="card">${mensaje}</div>`;
+    return;
+  }
+  contenedor.innerHTML = lista.map(crearTarjeta).join('');
+}
+
+function crearTarjeta(tarea) {
+  const ahora = Date.now();
+  const estaPospuesta = tarea.posponerHasta && Number(tarea.posponerHasta) > ahora;
+  const horaPospuesta = estaPospuesta ? new Date(Number(tarea.posponerHasta)).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
+  
+  const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
+  const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
+
+  return `
+    <div class="tarea ${prioClase}" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">
+      <div class="info">
+        <div class="hora">
+          ${escapar(tarea.hora || 'Sin horario')}
+          ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
+        </div>
+        <div class="nombre">${escapar(tarea.tarea)}</div>
+        <div class="detalle">
+          <span class="dotTipo ${tipoClase}"></span>
+          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''}
+        </div>
+        <div class="fechaTarea">${escapar(tarea.fechaLabel || tarea.fechaKey || '')}</div>
+      </div>
+      <div class="acciones" onclick="event.stopPropagation()">
+        ${tarea.estado !== 'Completada' ? `<button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>` : ''}
+        ${seccionActual === 'pospuestas' || estaPospuesta ? `<button class="volver" onclick="quitarPosponer('${escaparJS(tarea.id)}')">Restaurar</button>` : ''}
+        ${seccionActual === 'hoy' && tarea.estado !== 'Completada' ? `
+          <button class="posponer" onclick="posponer15('${escaparJS(tarea.id)}')">+15m</button>
+          <button class="posponer" onclick="posponer60('${escaparJS(tarea.id)}')">+1h</button>
+          <button class="manana" onclick="manana('${escaparJS(tarea.id)}')">Mañana</button>
+        ` : ''}
+        <button class="btnEditarAccion" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderizarCalendario() {
+  const grid = document.getElementById('calGrid');
+  const titulo = document.getElementById('calTitulo');
+  const year = calendarioFecha.getFullYear();
+  const month = calendarioFecha.getMonth();
+  const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  titulo.textContent = nombresMeses[month] + ' ' + year;
+  const primerDia = new Date(year, month, 1);
+  let inicio = primerDia.getDay();
+  inicio = inicio === 0 ? 6 : inicio - 1;
+
+  const diasMes = new Date(year, month + 1, 0).getDate();
+  const diasMesAnterior = new Date(year, month, 0).getDate();
+  let html = '';
+
+  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach(dia => { html += `<div class="calDiaSemana">${dia}</div>`; });
+
+  const hoy = obtenerHoyKey();
+  const totalCeldas = Math.ceil((inicio + diasMes) / 7) * 7;
+
+  for (let i = 0; i < totalCeldas; i++) {
+    let numero, mesCelda = month, yearCelda = year, otroMes = false;
+    if (i < inicio) {
+      numero = diasMesAnterior - inicio + i + 1; mesCelda = month - 1;
+      if (mesCelda < 0) { mesCelda = 11; yearCelda--; }
+      otroMes = true;
+    } else if (i >= inicio + diasMes) {
+      numero = i - inicio - diasMes + 1; mesCelda = month + 1;
+      if (mesCelda > 11) { mesCelda = 0; yearCelda++; }
+      otroMes = true;
+    } else { numero = i - inicio + 1; }
+
+    const key = yearCelda + '-' + String(mesCelda + 1).padStart(2, '0') + '-' + String(numero).padStart(2, '0');
+    const tareasDia = tareas.filter(t => t.fechaKey === key);
+
+    html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}"><div class="calNumero">${numero}</div>`;
+
+    tareasDia.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || ''))).forEach(t => {
+      const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
+      const claseCompletada = t.estado === 'Completada' ? 'completada' : '';
+
+      html += `
+        <div class="calTarea ${prioClase} ${claseCompletada}" onclick="abrirModalEditar('${escaparJS(t.id)}')">
+          ${escapar(t.tarea)}
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function cambiarMes(cantidad) { calendarioFecha.setMonth(calendarioFecha.getMonth() + cantidad); renderizarCalendario(); }
+function irAMesActual() { calendarioFecha = new Date(); renderizarCalendario(); }
+
+function buscarTareas() {
+  const texto = document.getElementById('inputBuscar').value.toLowerCase().trim();
+  if (texto === '') { document.getElementById('lista').innerHTML = `<div class="card">Escribí algo para buscar.</div>`; return; }
+  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey].join(' ').toLowerCase().includes(texto));
+  renderizar(resultados);
+}
+
+async function guardarNuevaTarea() {
+  const tarea = document.getElementById('nuevaTarea').value.trim();
+  const fecha = document.getElementById('nuevaFecha').value;
+  const hora = document.getElementById('nuevaHora').value;
+  const tipo = document.getElementById('nuevoTipo').value;
+  const prioridad = document.getElementById('nuevaPrioridad').value;
+  const repeticion = document.getElementById('nuevaRepeticion').value;
+  const repetirHasta = document.getElementById('nuevaRepetirHasta').value;
+
+  if (!tarea || !fecha) { mostrarToastUI('Escribí una tarea y fecha.'); return; }
+
+  mostrarToastUI('Guardando...');
+  try {
+    await callGAS('agregarTarea', { tarea, fecha, hora, tipo, prioridad, repeticion, repetirHasta });
+    document.getElementById('nuevaTarea').value = '';
+    document.getElementById('nuevaHora').value = '';
+    document.getElementById('nuevaRepetirHasta').value = '';
+    await cargarTareas();
+    mostrarToastUI('Tarea creada.');
+    mostrarSeccion('hoy');
+  } catch (e) { mostrarToastUI('Error al guardar.'); }
+}
+
+async function marcarHecho(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  t.estado = 'Completada';
+  actualizarUI();
+  mostrarToastUI('Completada.');
+  callGAS('marcarHecho', { id });
+}
+
+async function posponer15(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  t.posponerHasta = Date.now() + (15 * 60 * 1000);
+  actualizarUI();
+  mostrarToastUI('+15 minutos.');
+  callGAS('posponer', { id, minutos: 15 });
+}
+
+async function posponer60(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  t.posponerHasta = Date.now() + (60 * 60 * 1000);
+  actualizarUI();
+  mostrarToastUI('+1 hora.');
+  callGAS('posponer', { id, minutos: 60 });
+}
+
+async function manana(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  const m = new Date(); m.setDate(m.getDate() + 1); m.setHours(9, 0, 0, 0);
+  t.posponerHasta = m.getTime();
+  actualizarUI();
+  mostrarToastUI('Para mañana.');
+  callGAS('posponerManana', { id });
+}
+
+async function quitarPosponer(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  t.posponerHasta = '';
+  actualizarUI();
+  mostrarToastUI('Restaurada.');
+  callGAS('quitarPosponer', { id });
+}
+
+function abrirModalEditar(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('editId').value = t.id;
+  document.getElementById('editTarea').value = t.tarea;
+  document.getElementById('editFecha').value = t.fechaKey;
+  document.getElementById('editHora').value = t.hora || '';
+  document.getElementById('editTipo').value = t.tipo || 'Personal';
+  document.getElementById('editPrioridad').value = t.prioridad || 'Media';
+  document.getElementById('editRepeticion').value = t.repeticion || 'Una vez';
+  document.getElementById('modalEditar').classList.add('activo');
+}
+
+function cerrarModalEditar() { document.getElementById('modalEditar').classList.remove('activo'); }
+
+async function guardarEdicionModal() {
+  const id = document.getElementById('editId').value;
+  const tarea = document.getElementById('editTarea').value.trim();
+  const fecha = document.getElementById('editFecha').value;
+  const hora = document.getElementById('editHora').value;
+  const tipo = document.getElementById('editTipo').value;
+  const prioridad = document.getElementById('editPrioridad').value;
+  const repeticion = document.getElementById('editRepeticion').value;
+
+  if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
+
+  const t = tareas.find(x => x.id === id);
+  if (t) {
+    t.tarea = tarea; t.fechaKey = fecha; t.hora = hora; t.tipo = tipo; t.prioridad = prioridad; t.repeticion = repeticion;
+    actualizarUI();
+  }
+
+  cerrarModalEditar();
+  mostrarToastUI('Tarea actualizada.');
+  callGAS('editarTarea', { id, tarea, fecha, hora, tipo, prioridad, repeticion });
+}
+
+function confirmarEliminarModal() { cerrarModalEditar(); document.getElementById('modalConfirmar').classList.add('activo'); }
+function cerrarModalConfirmar() { document.getElementById('modalConfirmar').classList.remove('activo'); }
+
+async function ejecutarEliminacion() {
+  const id = document.getElementById('editId').value;
+  cerrarModalConfirmar();
+  tareas = tareas.filter(x => x.id !== id);
+  actualizarUI();
+  mostrarToastUI('Tarea eliminada.');
+  callGAS('eliminarTarea', { id });
+}
+
+async function cargarHistorial() {
+  try {
+    const datos = await callGAS('obtenerHistorial');
+    mostrarHistorial(datos);
+  } catch (e) { console.error(e); }
+}
+
+function mostrarHistorial(datos) {
+  const contenedor = document.getElementById('historial');
+  if (!datos || datos.length === 0) {
+    contenedor.innerHTML = `<div class="card">Todavía no hay historial.</div>`;
+    return;
+  }
+  contenedor.innerHTML = datos.map(item => `
+    <div style="background:white; padding:12px; border-radius:10px; margin-bottom:8px; border-left:4px solid var(--v3);">
+      <div style="font-weight:bold; color:var(--v2);">${escapar(item.accion)}</div>
+      <div>${escapar(item.tarea)}</div>
+      <small style="color:#888;">${escapar(item.fechaHora)}</small>
+    </div>
+  `).join('');
+}
+
+let toastTimer = null;
+function mostrarToastUI(mensaje) {
+  const toast = document.getElementById('toast');
+  toast.textContent = mensaje;
+  toast.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+function escapar(texto) {
+  return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function escaparJS(texto) {
+  return String(texto || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, '\\n');
+}
+</script>
+</body>
+</html>
