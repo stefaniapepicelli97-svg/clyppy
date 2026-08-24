@@ -121,16 +121,14 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 .numero { font-size: 26px; font-weight: bold; color: var(--v1); }
 .titulo { color: var(--v2); margin-top: 4px; font-size: 13px; }
 
-/* BARRA DE PROGRESO DIARIO */
 .progresoContainer { background: white; border-radius: 14px; padding: 14px 18px; margin-bottom: 15px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .progresoInfo { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--v2); }
-.barFondo { background: #f0ebf8; height: 10px; border-radius: 6px; overflow: hidden; }
-.barFill { background: linear-gradient(90deg, var(--v3), var(--v1)); height: 100%; width: 0%; transition: width 0.4s ease; }
+.barFondo { background: #f0ebf8; height: 8px; border-radius: 4px; overflow: hidden; }
+.barFill { background: var(--v2); height: 100%; width: 0%; transition: width 0.4s ease; }
 
-/* CREACIÓN RÁPIDA */
 .quickAdd { display: flex; gap: 8px; margin-bottom: 20px; }
-.quickAdd input { flex: 1; padding: 12px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 15px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; background: white; }
-.quickAdd button { background: var(--v1); color: white; border: none; border-radius: 12px; padding: 0 20px; font-weight: bold; cursor: pointer; }
+.quickAdd input { flex: 1; padding: 12px 16px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; background: white; }
+.quickAdd button { background: var(--v1); color: white; border: none; border-radius: 10px; padding: 0 20px; font-weight: bold; cursor: pointer; }
 
 .buscador { margin-bottom: 20px; }
 .buscador input { width: 100%; padding: 14px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 16px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; }
@@ -317,8 +315,8 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 
     <!-- CREACIÓN RÁPIDA -->
     <div id="quickAdd" class="quickAdd">
-      <input id="inputQuickAdd" type="text" placeholder="⚡ Agregar tarea rápida para hoy..." onkeypress="if(event.key==='Enter') guardarTareaRapida()">
-      <button onclick="guardarTareaRapida()">+ Crear</button>
+      <input id="inputQuickAdd" type="text" placeholder="Agregar tarea rápida para hoy..." onkeypress="if(event.key==='Enter') guardarTareaRapida()">
+      <button onclick="guardarTareaRapida()">Crear</button>
     </div>
 
     <div id="buscador" class="buscador" style="display:none;">
@@ -508,7 +506,6 @@ function escucharTareasUsuario() {
   const { collection, query, where, or, onSnapshot } = window.fbFunctions;
   const emailNormalizado = (currentUser.email || '').toLowerCase();
   
-  // Consulta de tareas propias O compartidas con el mail del usuario
   const q = query(
     collection(window.fbDb, "tareas"),
     or(
@@ -890,7 +887,7 @@ function crearTarjeta(tarea) {
         <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
         <div class="detalle">
           <span class="dotTipo ${tipoClase}"></span>
-          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · 🔄 ' + escapar(tarea.repeticion) : ''}
+          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · ' + escapar(tarea.repeticion) : ''}
         </div>
         <div class="fechaTarea">${escapar(tarea.fechaKey || '')}</div>
       </div>
