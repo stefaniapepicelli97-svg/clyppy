@@ -55,6 +55,13 @@
   --p-media: #f4a261;
   --p-baja: #2a9d8f;
 
+  /* COLORES POR TIPO */
+  --bg-trabajo: #e2ddf0;
+  --bg-personal: #f3e5f5;
+  --bg-f043: #fce4ec;
+  --bg-reunion: #e1f5fe;
+  --bg-seguimiento: #e0f2f1;
+
   --t-trabajo: #5e548e;
   --t-personal: #be95c4;
   --t-f043: #e0b1cb;
@@ -168,12 +175,42 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 .calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
 .calGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .calDiaSemana { text-align: center; font-size: 11px; font-weight: bold; color: var(--v2); padding: 6px 0; }
-.calCelda { min-height: 75px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; }
+.calCelda { min-height: 80px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; }
 .calCelda.otroMes { opacity: .35; }
 .calCelda.hoy { border: 2px solid var(--v3); }
 .calNumero { font-size: 11px; font-weight: bold; margin-bottom: 3px; }
-.calTarea { display: block; padding: 4px 5px; margin-bottom: 3px; border-radius: 5px; background: var(--v5); color: var(--v1); font-size: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-left: 3px solid var(--v4); }
-.calTarea.completada { text-decoration: line-through; opacity: .55; }
+
+/* BANNERS DEL CALENDARIO ESTILIZADOS */
+.calTarea { 
+  display: block; 
+  padding: 4px 6px; 
+  margin-bottom: 3px; 
+  border-radius: 6px; 
+  color: var(--v1); 
+  font-size: 10px; 
+  font-weight: 600;
+  overflow: hidden; 
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  border-left: 4px solid var(--v4);
+  background: var(--v5);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* FONDOS SEGÚN EL TIPO DE TAREA */
+.calTarea.tipo-trabajo { background: var(--bg-trabajo); color: #2c2250; }
+.calTarea.tipo-personal { background: var(--bg-personal); color: #4a148c; }
+.calTarea.tipo-f043 { background: var(--bg-f043); color: #880e4f; }
+.calTarea.tipo-reunión { background: var(--bg-reunion); color: #01579b; }
+.calTarea.tipo-reunion { background: var(--bg-reunion); color: #01579b; }
+.calTarea.tipo-seguimiento { background: var(--bg-seguimiento); color: #004d40; }
+
+/* BORDES SEGÚN PRIORIDAD */
+.calTarea.p-alta { border-left-color: var(--p-alta); }
+.calTarea.p-media { border-left-color: var(--p-media); }
+.calTarea.p-baja { border-left-color: var(--p-baja); }
+
+.calTarea.completada { text-decoration: line-through; opacity: .5; }
 
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
@@ -468,7 +505,7 @@ async function guardarNuevaTarea() {
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
       tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
-      estado: 'Pendiente', posponerHasta: '', createdAt: Date.now()
+      estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
     });
 
     document.getElementById('nuevaTarea').value = '';
@@ -480,9 +517,24 @@ async function guardarNuevaTarea() {
 }
 
 async function marcarHecho(id) {
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+
+  const hoy = obtenerHoyKey();
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada' });
-  mostrarToastUI('Completada.');
+
+  if (t.repeticion && t.repeticion !== 'Una vez') {
+    // Si es repetitiva, agrega HOY a la lista de fechas completadas
+    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    if (!completadas.includes(hoy)) {
+      completadas.push(hoy);
+    }
+    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
+  } else {
+    // Si no se repite, la marca completada en general
+    await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada' });
+  }
+  mostrarToastUI('Completada para hoy.');
 }
 
 async function posponer15(id) {
@@ -616,6 +668,37 @@ function obtenerHoyKey() {
   ].join('-');
 }
 
+function estaTareaCompletaEnFecha(t, fechaKey) {
+  if (t.estado === 'Completada') return true;
+  if (Array.isArray(t.completadasFechas) && t.completadasFechas.includes(fechaKey)) return true;
+  return false;
+}
+
+function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
+  if (!t.fechaKey) return false;
+  
+  const partes = t.fechaKey.split('-');
+  const fechaOrigen = new Date(partes[0], partes[1] - 1, partes[2]);
+  
+  if (t.fechaKey === fechaKey) return true;
+  if (!t.repeticion || t.repeticion === 'Una vez' || fechaCelda < fechaOrigen) return false;
+
+  if (t.repetirHasta) {
+    const partesLímite = t.repetirHasta.split('-');
+    const fechaLimite = new Date(partesLímite[0], partesLímite[1] - 1, partesLímite[2]);
+    if (fechaCelda > fechaLimite) return false;
+  }
+
+  const diaSemana = fechaCelda.getDay();
+
+  if (t.repeticion === 'Diaria') return true;
+  if (t.repeticion === 'Lunes a viernes') return diaSemana >= 1 && diaSemana <= 5;
+  if (t.repeticion === 'Semanal') return fechaCelda.getDay() === fechaOrigen.getDay();
+  if (t.repeticion === 'Mensual') return fechaCelda.getDate() === fechaOrigen.getDate();
+
+  return false;
+}
+
 function actualizarUI() {
   actualizarContadores();
   if (seccionActual === 'calendario') renderizarCalendario();
@@ -627,7 +710,7 @@ function actualizarContadores() {
   const hoy = obtenerHoyKey();
   const ahora = Date.now();
 
-  const pendientesHoy = tareas.filter(t => t.estado !== 'Completada' && t.fechaKey === hoy);
+  const pendientesHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && t.fechaKey === hoy);
   const pospuestas = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
   const urgentesHoy = pendientesHoy.filter(t => String(t.prioridad || '').toLowerCase().includes('alta'));
 
@@ -664,14 +747,15 @@ function mostrarSeccion(seccion) {
 function renderizarSegunSeccion() {
   const ahora = Date.now();
   const hoy = obtenerHoyKey();
+  const fechaHoyObj = new Date();
   let lista = [];
 
   if (seccionActual === 'hoy') {
-    lista = tareas.filter(t => t.estado !== 'Completada' && t.fechaKey === hoy);
+    lista = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
   } else if (seccionActual === 'pospuestas') {
     lista = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
   } else if (seccionActual === 'completadas') {
-    lista = tareas.filter(t => t.estado === 'Completada');
+    lista = tareas.filter(t => t.estado === 'Completada' || (Array.isArray(t.completadasFechas) && t.completadasFechas.length > 0));
   }
 
   lista.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || '')));
@@ -693,8 +777,10 @@ function renderizar(lista) {
 
 function crearTarjeta(tarea) {
   const ahora = Date.now();
+  const hoy = obtenerHoyKey();
   const estaPospuesta = tarea.posponerHasta && Number(tarea.posponerHasta) > ahora;
   const horaPospuesta = estaPospuesta ? new Date(Number(tarea.posponerHasta)).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
+  const estaHechaHoy = estaTareaCompletaEnFecha(tarea, hoy);
   
   const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
   const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
@@ -706,7 +792,7 @@ function crearTarjeta(tarea) {
           ${escapar(tarea.hora || 'Sin horario')}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
         </div>
-        <div class="nombre">${escapar(tarea.tarea)}</div>
+        <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
         <div class="detalle">
           <span class="dotTipo ${tipoClase}"></span>
           ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · 🔄 ' + escapar(tarea.repeticion) : ''}
@@ -714,9 +800,9 @@ function crearTarjeta(tarea) {
         <div class="fechaTarea">${escapar(tarea.fechaKey || '')}</div>
       </div>
       <div class="acciones" onclick="event.stopPropagation()">
-        ${tarea.estado !== 'Completada' ? `<button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>` : ''}
+        ${!estaHechaHoy ? `<button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>` : ''}
         ${seccionActual === 'pospuestas' || estaPospuesta ? `<button class="volver" onclick="quitarPosponer('${escaparJS(tarea.id)}')">Restaurar</button>` : ''}
-        ${seccionActual === 'hoy' && tarea.estado !== 'Completada' ? `
+        ${seccionActual === 'hoy' && !estaHechaHoy ? `
           <button class="posponer" onclick="posponer15('${escaparJS(tarea.id)}')">+15m</button>
           <button class="posponer" onclick="posponer60('${escaparJS(tarea.id)}')">+1h</button>
           <button class="manana" onclick="manana('${escaparJS(tarea.id)}')">Mañana</button>
@@ -765,39 +851,18 @@ function renderizarCalendario() {
     const key = yearCelda + '-' + String(mesCelda + 1).padStart(2, '0') + '-' + String(numero).padStart(2, '0');
     const fechaCelda = new Date(yearCelda, mesCelda, numero);
 
-    const tareasDia = tareas.filter(t => {
-      if (!t.fechaKey) return false;
-      
-      const partes = t.fechaKey.split('-');
-      const fechaOrigen = new Date(partes[0], partes[1] - 1, partes[2]);
-      
-      if (t.fechaKey === key) return true;
-      if (!t.repeticion || t.repeticion === 'Una vez' || fechaCelda < fechaOrigen) return false;
-
-      if (t.repetirHasta) {
-        const partesLímite = t.repetirHasta.split('-');
-        const fechaLimite = new Date(partesLímite[0], partesLímite[1] - 1, partesLímite[2]);
-        if (fechaCelda > fechaLimite) return false;
-      }
-
-      const diaSemana = fechaCelda.getDay();
-
-      if (t.repeticion === 'Diaria') return true;
-      if (t.repeticion === 'Lunes a viernes') return diaSemana >= 1 && diaSemana <= 5;
-      if (t.repeticion === 'Semanal') return fechaCelda.getDay() === fechaOrigen.getDay();
-      if (t.repeticion === 'Mensual') return fechaCelda.getDate() === fechaOrigen.getDate();
-
-      return false;
-    });
+    const tareasDia = tareas.filter(t => estaTareaActivaEnFecha(t, fechaCelda, key));
 
     html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}"><div class="calNumero">${numero}</div>`;
 
     tareasDia.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || ''))).forEach(t => {
       const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
-      const claseCompletada = t.estado === 'Completada' ? 'completada' : '';
+      const tipoNormalizado = String(t.tipo || 'personal').toLowerCase().trim();
+      const tipoClase = 'tipo-' + tipoNormalizado;
+      const estaCompletadaEnEseDia = estaTareaCompletaEnFecha(t, key);
 
       html += `
-        <div class="calTarea ${prioClase} ${claseCompletada}" onclick="abrirModalEditar('${escaparJS(t.id)}')">
+        <div class="calTarea ${prioClase} ${tipoClase} ${estaCompletadaEnEseDia ? 'completada' : ''}" onclick="abrirModalEditar('${escaparJS(t.id)}')">
           ${escapar(t.tarea)}
         </div>
       `;
