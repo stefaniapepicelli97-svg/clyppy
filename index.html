@@ -244,15 +244,17 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
+/* MODALES OPTIMIZADOS PARA CELULAR Y TECLADO VIRTUAL */
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
-.modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 .modalHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .modalHeader h3 { margin: 0; font-weight: 700; }
 .btnCloseModal { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--v2); }
+.modalBody { overflow-y: auto; padding-right: 4px; flex: 1; -webkit-overflow-scrolling: touch; }
 .modalBody label { display: block; margin-top: 10px; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
 .modalBody input, .modalBody select, .modalBody textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
-.modalFooter { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
+.modalFooter { margin-top: 15px; display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid #eee; }
 .btnEliminar { background: #e63946; color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
 .btnGuardarModal { background: var(--v1); color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
 
@@ -426,7 +428,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     </div>
     <div class="modalBody">
       <input type="hidden" id="editId">
-      <label>Tarea</label><input id="editTarea" type="text">
+      <label>Tarea</label><input id="editTarea" type="text" onblur="window.scrollTo(0, 0)">
       <div class="filaFormulario">
         <div><label>Fecha</label><input id="editFecha" type="date"></div>
         <div><label>Hora</label><input id="editHora" type="time"></div>
@@ -455,9 +457,9 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         <option>Mensual (Antepenúltimo día hábil)</option>
       </select>
       <label>Observaciones</label>
-      <textarea id="editObservacion" rows="2" placeholder="Agregar detalles u observaciones..."></textarea>
+      <textarea id="editObservacion" rows="3" placeholder="Agregar detalles u observaciones..." onblur="window.scrollTo(0, 0)"></textarea>
       <label>Compartir con amigo (Gmail)</label>
-      <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados">
+      <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados" onblur="window.scrollTo(0, 0)">
       
       <div style="margin-top: 15px; padding: 10px; background: #f0ebf8; border-radius: 8px; font-size: 13px; color: var(--v1); display: flex; justify-content: space-between; align-items: center;">
         <span>⏱️ Tiempo acumulado: <strong id="editTiempoAcumulado">0m 0s</strong></span>
@@ -468,8 +470,23 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <button class="btnEliminar" onclick="confirmarEliminarModal()">Eliminar</button>
       <div>
         <button class="btnEditarAccion" onclick="cerrarModalEditar()">Cancelar</button>
-        <button class="btnGuardarModal" onclick="guardarEdicionModal()">Guardar</button>
+        <button class="btnGuardarModal" onclick="procesarGuardarModal()">Guardar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ACCIÓN DE SERIE RECURRENTE -->
+<div id="modalRecurrente" class="modalOverlay">
+  <div class="modal" style="max-width: 400px;">
+    <div class="modalHeader"><h3 id="tituloModalRecurrente">Tarea recurrente</h3></div>
+    <div class="modalBody">
+      <p style="margin: 5px 0 15px; color: var(--v2); font-size: 14px;" id="descModalRecurrente">Esta tarea forma parte de una serie que se repite. ¿Cómo querés aplicar este cambio?</p>
+    </div>
+    <div class="modalFooter" style="flex-direction: column; gap: 8px;">
+      <button class="btnGuardarModal" style="width: 100%;" onclick="ejecutarAccionRecurrente('solo_esta')">Aplicar solo a esta fecha</button>
+      <button class="btnEditarAccion" style="width: 100%; justify-content: center; background: #e0b1cb;" onclick="ejecutarAccionRecurrente('todas')">Aplicar a todas las demás</button>
+      <button class="btnEditarAccion" style="width: 100%; justify-content: center;" onclick="cerrarModalRecurrente()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -480,7 +497,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     <div class="modalBody"><p style="margin: 5px 0; color: var(--v2);">Esta acción no se puede deshacer.</p></div>
     <div class="modalFooter" style="justify-content: flex-end; gap: 10px;">
       <button class="btnEditarAccion" onclick="cerrarModalConfirmar()">Cancelar</button>
-      <button class="btnEliminar" onclick="ejecutarEliminacion()">Eliminar</button>
+      <button class="btnEliminar" onclick="procesarEliminarModal()">Eliminar</button>
     </div>
   </div>
 </div>
@@ -499,7 +516,7 @@ let notifPermiso = false;
 let notificadosMap = {};
 let unsubscribeSnapshot = null;
 let pipWindow = null;
-let timerInterval = null;
+let accionPendienteRecurrente = null;
 
 document.addEventListener('DOMContentLoaded', iniciar);
 
@@ -522,8 +539,8 @@ function iniciar() {
 function registrarServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker registrado correctamente:', reg.scope))
-      .catch(err => console.error('Error al registrar Service Worker:', err));
+      .then(reg => console.log('Service Worker registrado:', reg.scope))
+      .catch(err => console.error('Service Worker error:', err));
   }
 }
 
@@ -746,9 +763,7 @@ function formatearSegundos(seg) {
   const h = Math.floor(seg / 3600);
   const m = Math.floor((seg % 3600) / 60);
   const s = seg % 60;
-  if (h > 0) {
-    return `${h}h ${m}m ${s}s`;
-  }
+  if (h > 0) return `${h}h ${m}m ${s}s`;
   return `${m}m ${s}s`;
 }
 
@@ -793,8 +808,57 @@ async function quitarPosponer(id) {
   mostrarToastUI('Restaurada.');
 }
 
-async function guardarEdicionModal() {
+// MANEJO DE EDICIÓN Y ELIMINACIÓN RECURRENTE
+function procesarGuardarModal() {
   const id = document.getElementById('editId').value;
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+
+  if (t.repeticion && t.repeticion !== 'Una vez') {
+    accionPendienteRecurrente = { tipo: 'editar' };
+    document.getElementById('tituloModalRecurrente').textContent = "Editar tarea recurrente";
+    document.getElementById('modalRecurrente').classList.add('activo');
+  } else {
+    guardarEdicionModal('todas');
+  }
+}
+
+function procesarEliminarModal() {
+  const id = document.getElementById('editId').value;
+  const t = tareas.find(x => x.id === id);
+  cerrarModalConfirmar();
+
+  if (t && t.repeticion && t.repeticion !== 'Una vez') {
+    accionPendienteRecurrente = { tipo: 'eliminar' };
+    document.getElementById('tituloModalRecurrente').textContent = "Eliminar tarea recurrente";
+    document.getElementById('modalRecurrente').classList.add('activo');
+  } else {
+    ejecutarEliminacion('todas');
+  }
+}
+
+function cerrarModalRecurrente() {
+  document.getElementById('modalRecurrente').classList.remove('activo');
+  accionPendienteRecurrente = null;
+}
+
+function ejecutarAccionRecurrente(modo) {
+  if (!accionPendienteRecurrente) return;
+  const tipo = accionPendienteRecurrente.tipo;
+  cerrarModalRecurrente();
+
+  if (tipo === 'editar') {
+    guardarEdicionModal(modo);
+  } else if (tipo === 'eliminar') {
+    ejecutarEliminacion(modo);
+  }
+}
+
+async function guardarEdicionModal(modoRecurrencia) {
+  const id = document.getElementById('editId').value;
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+
   const tarea = document.getElementById('editTarea').value.trim();
   const fecha = document.getElementById('editFecha').value;
   const hora = document.getElementById('editHora').value;
@@ -805,13 +869,56 @@ async function guardarEdicionModal() {
   const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
-
   if (invitadoEmail) await guardarContactoSiNuevo(invitadoEmail);
 
-  const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, observacion, invitadoEmail });
+  const { doc, updateDoc, collection, addDoc } = window.fbFunctions;
+
+  if (modoRecurrencia === 'solo_esta') {
+    // Si elige "Solo a esta", creamos una copia individual para esta fecha
+    await addDoc(collection(window.fbDb, "tareas"), {
+      userId: currentUser.uid,
+      creadorEmail: currentUser.email || '',
+      invitadoEmail: invitadoEmail,
+      tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion: 'Una vez', repetirHasta: '',
+      observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
+      tiempoAcumuladoSec: Number(t.tiempoAcumuladoSec || 0), timerInicio: null
+    });
+
+    // Desvinculamos esta fecha de la serie original guardándola como completada/omitida
+    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    if (!completadas.includes(fecha)) completadas.push(fecha);
+    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
+
+  } else {
+    // Si elige "Todas las demás", actualizamos directamente la tarea base
+    await updateDoc(doc(window.fbDb, "tareas", id), {
+      tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, observacion, invitadoEmail
+    });
+  }
+
   cerrarModalEditar();
   mostrarToastUI('Tarea actualizada.');
+}
+
+async function ejecutarEliminacion(modoRecurrencia) {
+  const id = document.getElementById('editId').value;
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+
+  const { doc, deleteDoc, updateDoc } = window.fbFunctions;
+
+  if (modoRecurrencia === 'solo_esta') {
+    const hoy = t.fechaKey || obtenerHoyKey();
+    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    if (!completadas.includes(hoy)) completadas.push(hoy);
+    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
+    cerrarModalEditar();
+    mostrarToastUI('Ocurrencia eliminada.');
+  } else {
+    await deleteDoc(doc(window.fbDb, "tareas", id));
+    cerrarModalEditar();
+    mostrarToastUI('Serie eliminada.');
+  }
 }
 
 async function resetearTiempoModal() {
@@ -820,14 +927,6 @@ async function resetearTiempoModal() {
   await updateDoc(doc(window.fbDb, "tareas", id), { tiempoAcumuladoSec: 0, timerInicio: null });
   document.getElementById('editTiempoAcumulado').textContent = '0m 0s';
   mostrarToastUI('Tiempo reseteado.');
-}
-
-async function ejecutarEliminacion() {
-  const id = document.getElementById('editId').value;
-  cerrarModalConfirmar();
-  const { doc, deleteDoc } = window.fbFunctions;
-  await deleteDoc(doc(window.fbDb, "tareas", id));
-  mostrarToastUI('Tarea eliminada.');
 }
 
 function comprobarNotificacionesIncapacidad() {
