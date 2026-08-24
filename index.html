@@ -21,7 +21,6 @@
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Claves de Firebase de tu proyecto
   const firebaseConfig = {
     apiKey: "AIzaSyB8TTasWFGNGaHeI0J_LYYwAgXzEH98kHo",
     authDomain: "clyppy-ed89c.firebaseapp.com",
@@ -70,7 +69,6 @@
 html, body { margin: 0; min-height: 100%; }
 body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); color: var(--v1); }
 
-/* PANTALLA DE LOGIN */
 .loginOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--v1); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; text-align: center; color: white; }
 .loginCard { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px 25px; max-width: 400px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
 .loginLogo { font-family: Ebrima, "Segoe UI", sans-serif; font-size: 38px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 12px; }
@@ -209,7 +207,6 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 
 <body>
 
-<!-- PANTALLA DE INICIO DE SESIÓN -->
 <div id="loginScreen" class="loginOverlay">
   <div class="loginCard">
     <div class="loginLogo"><span class="clip"></span> Clyppy</div>
@@ -266,6 +263,7 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
       <input id="inputBuscar" type="text" placeholder="Buscar tarea..." oninput="buscarTareas()">
     </div>
 
+    <!-- FORMULARIO DE NUEVA TAREA (CON REPETICIÓN RESTAURADA) -->
     <div id="formulario" class="formulario" style="display:none;">
       <h2>Nueva tarea</h2>
       <label>¿Qué tenés que hacer?</label>
@@ -288,6 +286,18 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
           </select>
         </div>
       </div>
+      <div class="filaFormulario">
+        <div>
+          <label>Repetición</label>
+          <select id="nuevaRepeticion" onchange="toggleRepetirHasta()">
+            <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+          </select>
+        </div>
+        <div id="colRepetirHasta" style="display:none;">
+          <label>Repetir hasta (opcional)</label>
+          <input id="nuevaRepetirHasta" type="date">
+        </div>
+      </div>
       <button class="btnGuardar" onclick="guardarNuevaTarea()">Guardar tarea</button>
     </div>
 
@@ -307,6 +317,7 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
   </div>
 </main>
 
+<!-- MODAL DE EDICIÓN (CON REPETICIÓN RESTAURADA) -->
 <div id="modalEditar" class="modalOverlay">
   <div class="modal">
     <div class="modalHeader">
@@ -334,6 +345,10 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
           </select>
         </div>
       </div>
+      <label>Repetición</label>
+      <select id="editRepeticion">
+        <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+      </select>
     </div>
     <div class="modalFooter">
       <button class="btnEliminar" onclick="confirmarEliminarModal()">Eliminar</button>
@@ -418,6 +433,11 @@ function cerrarSesion() {
   window.fbSignOut();
 }
 
+function toggleRepetirHasta() {
+  const rep = document.getElementById('nuevaRepeticion').value;
+  document.getElementById('colRepetirHasta').style.display = (rep !== 'Una vez') ? 'block' : 'none';
+}
+
 function escucharTareasUsuario() {
   if (!currentUser) return;
   
@@ -439,6 +459,8 @@ async function guardarNuevaTarea() {
   const hora = document.getElementById('nuevaHora').value;
   const tipo = document.getElementById('nuevoTipo').value;
   const prioridad = document.getElementById('nuevaPrioridad').value;
+  const repeticion = document.getElementById('nuevaRepeticion').value;
+  const repetirHasta = document.getElementById('nuevaRepetirHasta').value;
 
   if (!tarea || !fecha) { mostrarToastUI('Escribí una tarea y fecha.'); return; }
 
@@ -447,12 +469,13 @@ async function guardarNuevaTarea() {
     const { collection, addDoc } = window.fbFunctions;
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
-      tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad,
+      tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
       estado: 'Pendiente', posponerHasta: '', createdAt: Date.now()
     });
 
     document.getElementById('nuevaTarea').value = '';
     document.getElementById('nuevaHora').value = '';
+    document.getElementById('nuevaRepetirHasta').value = '';
     mostrarToastUI('Tarea creada.');
     mostrarSeccion('hoy');
   } catch (e) { mostrarToastUI('Error al guardar.'); }
@@ -498,11 +521,12 @@ async function guardarEdicionModal() {
   const hora = document.getElementById('editHora').value;
   const tipo = document.getElementById('editTipo').value;
   const prioridad = document.getElementById('editPrioridad').value;
+  const repeticion = document.getElementById('editRepeticion').value;
 
   if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
 
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad });
+  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion });
   cerrarModalEditar();
   mostrarToastUI('Tarea actualizada.');
 }
@@ -685,7 +709,7 @@ function crearTarjeta(tarea) {
         <div class="nombre">${escapar(tarea.tarea)}</div>
         <div class="detalle">
           <span class="dotTipo ${tipoClase}"></span>
-          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''}
+          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · 🔄 ' + escapar(tarea.repeticion) : ''}
         </div>
         <div class="fechaTarea">${escapar(tarea.fechaKey || '')}</div>
       </div>
@@ -764,7 +788,7 @@ function irAMesActual() { calendarioFecha = new Date(); renderizarCalendario(); 
 function buscarTareas() {
   const texto = document.getElementById('inputBuscar').value.toLowerCase().trim();
   if (texto === '') { document.getElementById('lista').innerHTML = `<div class="card">Escribí algo para buscar.</div>`; return; }
-  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.estado, t.fechaKey].join(' ').toLowerCase().includes(texto));
+  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey].join(' ').toLowerCase().includes(texto));
   renderizar(resultados);
 }
 
@@ -777,6 +801,7 @@ function abrirModalEditar(id) {
   document.getElementById('editHora').value = t.hora || '';
   document.getElementById('editTipo').value = t.tipo || 'Personal';
   document.getElementById('editPrioridad').value = t.prioridad || 'Media';
+  document.getElementById('editRepeticion').value = t.repeticion || 'Una vez';
   document.getElementById('modalEditar').classList.add('activo');
 }
 
