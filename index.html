@@ -19,7 +19,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB8TTasWFGNGaHeI0J_LYYwAgXzEH98kHo",
@@ -40,7 +40,7 @@
   window.fbProvider = provider;
   window.fbSignIn = () => signInWithPopup(auth, provider);
   window.fbSignOut = () => signOut(auth);
-  window.fbFunctions = { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where };
+  window.fbFunctions = { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or };
 </script>
 
 <style>
@@ -55,7 +55,6 @@
   --p-media: #f4a261;
   --p-baja: #2a9d8f;
 
-  /* COLORES POR TIPO */
   --bg-trabajo: #e2ddf0;
   --bg-personal: #f3e5f5;
   --bg-f043: #fce4ec;
@@ -116,10 +115,22 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
-.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-.card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; }
+.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+.card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; cursor: pointer; transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); }
 .numero { font-size: 26px; font-weight: bold; color: var(--v1); }
 .titulo { color: var(--v2); margin-top: 4px; font-size: 13px; }
+
+/* BARRA DE PROGRESO DIARIO */
+.progresoContainer { background: white; border-radius: 14px; padding: 14px 18px; margin-bottom: 15px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.progresoInfo { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 8px; color: var(--v2); }
+.barFondo { background: #f0ebf8; height: 10px; border-radius: 6px; overflow: hidden; }
+.barFill { background: linear-gradient(90deg, var(--v3), var(--v1)); height: 100%; width: 0%; transition: width 0.4s ease; }
+
+/* CREACIÓN RÁPIDA */
+.quickAdd { display: flex; gap: 8px; margin-bottom: 20px; }
+.quickAdd input { flex: 1; padding: 12px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 15px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; background: white; }
+.quickAdd button { background: var(--v1); color: white; border: none; border-radius: 12px; padding: 0 20px; font-weight: bold; cursor: pointer; }
 
 .buscador { margin-bottom: 20px; }
 .buscador input { width: 100%; padding: 14px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 16px; outline: none; font-family: Gadugi, "Segoe UI", sans-serif; }
@@ -148,6 +159,7 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 .detalle { color: var(--v2); font-size: 13px; }
 .fechaTarea { display: inline-block; margin-top: 6px; color: var(--v2); font-size: 12px; }
 .tagPospuesta { background: var(--v5); color: var(--v1); font-weight: bold; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-left: 6px; font-size: 11px; }
+.tagInvitado { background: #e1f5fe; color: #01579b; font-weight: bold; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-left: 6px; font-size: 11px; }
 
 .acciones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; align-items: center; }
 .acciones button { border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: Gadugi, "Segoe UI", sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -175,12 +187,12 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 .calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; }
 .calGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .calDiaSemana { text-align: center; font-size: 11px; font-weight: bold; color: var(--v2); padding: 6px 0; }
-.calCelda { min-height: 80px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; }
+.calCelda { min-height: 80px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; transition: background 0.2s; }
+.calCelda:hover { background: #fdfbff; }
 .calCelda.otroMes { opacity: .35; }
 .calCelda.hoy { border: 2px solid var(--v3); }
 .calNumero { font-size: 11px; font-weight: bold; margin-bottom: 3px; }
 
-/* BANNERS DEL CALENDARIO ESTILIZADOS */
 .calTarea { 
   display: block; 
   padding: 4px 6px; 
@@ -197,7 +209,6 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* FONDOS SEGÚN EL TIPO DE TAREA */
 .calTarea.tipo-trabajo { background: var(--bg-trabajo); color: #2c2250; }
 .calTarea.tipo-personal { background: var(--bg-personal); color: #4a148c; }
 .calTarea.tipo-f043 { background: var(--bg-f043); color: #880e4f; }
@@ -205,7 +216,6 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 .calTarea.tipo-reunion { background: var(--bg-reunion); color: #01579b; }
 .calTarea.tipo-seguimiento { background: var(--bg-seguimiento); color: #004d40; }
 
-/* BORDES SEGÚN PRIORIDAD */
 .calTarea.p-alta { border-left-color: var(--p-alta); }
 .calTarea.p-media { border-left-color: var(--p-media); }
 .calTarea.p-baja { border-left-color: var(--p-baja); }
@@ -291,9 +301,24 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
 
   <div class="contenedor">
     <div class="resumen">
-      <div class="card"><div class="numero" id="total">0</div><div class="titulo">Pendientes</div></div>
-      <div class="card"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
-      <div class="card"><div class="numero" id="pospuestas">0</div><div class="titulo">Pospuestas</div></div>
+      <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
+      <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
+      <div class="card" onclick="mostrarSeccion('pospuestas')"><div class="numero" id="pospuestas">0</div><div class="titulo">Pospuestas</div></div>
+    </div>
+
+    <!-- BARRA DE PROGRESO DE HOY -->
+    <div id="progresoContainer" class="progresoContainer">
+      <div class="progresoInfo">
+        <span>Progreso de hoy</span>
+        <span id="progresoTexto">0%</span>
+      </div>
+      <div class="barFondo"><div id="barFill" class="barFill"></div></div>
+    </div>
+
+    <!-- CREACIÓN RÁPIDA -->
+    <div id="quickAdd" class="quickAdd">
+      <input id="inputQuickAdd" type="text" placeholder="⚡ Agregar tarea rápida para hoy..." onkeypress="if(event.key==='Enter') guardarTareaRapida()">
+      <button onclick="guardarTareaRapida()">+ Crear</button>
     </div>
 
     <div id="buscador" class="buscador" style="display:none;">
@@ -334,6 +359,8 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
           <input id="nuevaRepetirHasta" type="date">
         </div>
       </div>
+      <label>Compartir con amigo (Gmail)</label>
+      <input id="nuevoInvitado" type="email" placeholder="amigo@gmail.com (opcional)">
       <button class="btnGuardar" onclick="guardarNuevaTarea()">Guardar tarea</button>
     </div>
 
@@ -384,6 +411,8 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
       <select id="editRepeticion">
         <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
       </select>
+      <label>Compartir con amigo (Gmail)</label>
+      <input id="editInvitado" type="email" placeholder="amigo@gmail.com">
     </div>
     <div class="modalFooter">
       <button class="btnEliminar" onclick="confirmarEliminarModal()">Eliminar</button>
@@ -476,8 +505,17 @@ function toggleRepetirHasta() {
 function escucharTareasUsuario() {
   if (!currentUser) return;
   
-  const { collection, query, where, onSnapshot } = window.fbFunctions;
-  const q = query(collection(window.fbDb, "tareas"), where("userId", "==", currentUser.uid));
+  const { collection, query, where, or, onSnapshot } = window.fbFunctions;
+  const emailNormalizado = (currentUser.email || '').toLowerCase();
+  
+  // Consulta de tareas propias O compartidas con el mail del usuario
+  const q = query(
+    collection(window.fbDb, "tareas"),
+    or(
+      where("userId", "==", currentUser.uid),
+      where("invitadoEmail", "==", emailNormalizado)
+    )
+  );
 
   unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
     tareas = [];
@@ -496,6 +534,7 @@ async function guardarNuevaTarea() {
   const prioridad = document.getElementById('nuevaPrioridad').value;
   const repeticion = document.getElementById('nuevaRepeticion').value;
   const repetirHasta = document.getElementById('nuevaRepetirHasta').value;
+  const invitadoEmail = document.getElementById('nuevoInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Escribí una tarea y fecha.'); return; }
 
@@ -504,6 +543,8 @@ async function guardarNuevaTarea() {
     const { collection, addDoc } = window.fbFunctions;
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
+      creadorEmail: currentUser.email || '',
+      invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
       estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
     });
@@ -511,8 +552,30 @@ async function guardarNuevaTarea() {
     document.getElementById('nuevaTarea').value = '';
     document.getElementById('nuevaHora').value = '';
     document.getElementById('nuevaRepetirHasta').value = '';
+    document.getElementById('nuevoInvitado').value = '';
     mostrarToastUI('Tarea creada.');
     mostrarSeccion('hoy');
+  } catch (e) { mostrarToastUI('Error al guardar.'); }
+}
+
+async function guardarTareaRapida() {
+  const input = document.getElementById('inputQuickAdd');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  const hoy = obtenerHoyKey();
+  mostrarToastUI('Guardando...');
+  try {
+    const { collection, addDoc } = window.fbFunctions;
+    await addDoc(collection(window.fbDb, "tareas"), {
+      userId: currentUser.uid,
+      creadorEmail: currentUser.email || '',
+      invitadoEmail: '',
+      tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
+      estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
+    });
+    input.value = '';
+    mostrarToastUI('Tarea rápida añadida.');
   } catch (e) { mostrarToastUI('Error al guardar.'); }
 }
 
@@ -524,17 +587,15 @@ async function marcarHecho(id) {
   const { doc, updateDoc } = window.fbFunctions;
 
   if (t.repeticion && t.repeticion !== 'Una vez') {
-    // Si es repetitiva, agrega HOY a la lista de fechas completadas
     let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
     if (!completadas.includes(hoy)) {
       completadas.push(hoy);
     }
     await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
   } else {
-    // Si no se repite, la marca completada en general
     await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada' });
   }
-  mostrarToastUI('Completada para hoy.');
+  mostrarToastUI('Completada.');
 }
 
 async function posponer15(id) {
@@ -572,11 +633,12 @@ async function guardarEdicionModal() {
   const tipo = document.getElementById('editTipo').value;
   const prioridad = document.getElementById('editPrioridad').value;
   const repeticion = document.getElementById('editRepeticion').value;
+  const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
 
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion });
+  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, invitadoEmail });
   cerrarModalEditar();
   mostrarToastUI('Tarea actualizada.');
 }
@@ -701,6 +763,7 @@ function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
 
 function actualizarUI() {
   actualizarContadores();
+  actualizarProgreso();
   if (seccionActual === 'calendario') renderizarCalendario();
   else if (seccionActual === 'buscar') buscarTareas();
   else if (seccionActual !== 'nueva') renderizarSegunSeccion();
@@ -709,14 +772,42 @@ function actualizarUI() {
 function actualizarContadores() {
   const hoy = obtenerHoyKey();
   const ahora = Date.now();
+  const fechaHoyObj = new Date();
 
-  const pendientesHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && t.fechaKey === hoy);
+  const pendientesHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
   const pospuestas = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
   const urgentesHoy = pendientesHoy.filter(t => String(t.prioridad || '').toLowerCase().includes('alta'));
 
   document.getElementById('total').textContent = pendientesHoy.length;
   document.getElementById('urgentes').textContent = urgentesHoy.length;
   document.getElementById('pospuestas').textContent = pospuestas.length;
+}
+
+function actualizarProgreso() {
+  const hoy = obtenerHoyKey();
+  const fechaHoyObj = new Date();
+  const deHoy = tareas.filter(t => estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
+  if (deHoy.length === 0) {
+    document.getElementById('progresoTexto').textContent = '0%';
+    document.getElementById('barFill').style.width = '0%';
+    return;
+  }
+  const completadas = deHoy.filter(t => estaTareaCompletaEnFecha(t, hoy)).length;
+  const pct = Math.round((completadas / deHoy.length) * 100);
+  document.getElementById('progresoTexto').textContent = pct + '% (' + completadas + '/' + deHoy.length + ')';
+  document.getElementById('barFill').style.width = pct + '%';
+}
+
+function filtrarAltaPrioridad() {
+  seccionActual = 'hoy';
+  document.querySelectorAll('.menu button').forEach(b => b.classList.remove('activo'));
+  document.getElementById('menuHoy').classList.add('activo');
+  document.getElementById('tituloHeader').textContent = 'Mis tareas (Alta prioridad)';
+  
+  const hoy = obtenerHoyKey();
+  const fechaHoyObj = new Date();
+  const altas = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy) && String(t.prioridad || '').toLowerCase() === 'alta');
+  renderizar(altas);
 }
 
 function mostrarSeccion(seccion) {
@@ -734,6 +825,8 @@ function mostrarSeccion(seccion) {
   document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
   document.getElementById('formulario').style.display = seccion === 'nueva' ? 'block' : 'none';
   document.getElementById('calendario').style.display = seccion === 'calendario' ? 'block' : 'none';
+  document.getElementById('quickAdd').style.display = seccion === 'hoy' ? 'flex' : 'none';
+  document.getElementById('progresoContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
   const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', pospuestas: 'Pospuestas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
@@ -781,6 +874,7 @@ function crearTarjeta(tarea) {
   const estaPospuesta = tarea.posponerHasta && Number(tarea.posponerHasta) > ahora;
   const horaPospuesta = estaPospuesta ? new Date(Number(tarea.posponerHasta)).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
   const estaHechaHoy = estaTareaCompletaEnFecha(tarea, hoy);
+  const esInvitado = tarea.invitadoEmail && currentUser && tarea.invitadoEmail === currentUser.email.toLowerCase();
   
   const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
   const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
@@ -791,6 +885,7 @@ function crearTarjeta(tarea) {
         <div class="hora">
           ${escapar(tarea.hora || 'Sin horario')}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
+          ${esInvitado ? `<span class="tagInvitado">Compartida con vos</span>` : ''}
         </div>
         <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
         <div class="detalle">
@@ -853,7 +948,7 @@ function renderizarCalendario() {
 
     const tareasDia = tareas.filter(t => estaTareaActivaEnFecha(t, fechaCelda, key));
 
-    html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}"><div class="calNumero">${numero}</div>`;
+    html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}" onclick="crearTareaDesdeCalendario('${key}')"><div class="calNumero">${numero}</div>`;
 
     tareasDia.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || ''))).forEach(t => {
       const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
@@ -862,7 +957,7 @@ function renderizarCalendario() {
       const estaCompletadaEnEseDia = estaTareaCompletaEnFecha(t, key);
 
       html += `
-        <div class="calTarea ${prioClase} ${tipoClase} ${estaCompletadaEnEseDia ? 'completada' : ''}" onclick="abrirModalEditar('${escaparJS(t.id)}')">
+        <div class="calTarea ${prioClase} ${tipoClase} ${estaCompletadaEnEseDia ? 'completada' : ''}" onclick="event.stopPropagation(); abrirModalEditar('${escaparJS(t.id)}')">
           ${escapar(t.tarea)}
         </div>
       `;
@@ -870,6 +965,11 @@ function renderizarCalendario() {
     html += `</div>`;
   }
   grid.innerHTML = html;
+}
+
+function crearTareaDesdeCalendario(fechaStr) {
+  mostrarSeccion('nueva');
+  document.getElementById('nuevaFecha').value = fechaStr;
 }
 
 function cambiarMes(cantidad) { calendarioFecha.setMonth(calendarioFecha.getMonth() + cantidad); renderizarCalendario(); }
@@ -881,7 +981,7 @@ function buscarTareas() {
     renderizar(tareas); 
     return; 
   }
-  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey].join(' ').toLowerCase().includes(texto));
+  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey, t.invitadoEmail].join(' ').toLowerCase().includes(texto));
   renderizar(resultados);
 }
 
@@ -895,6 +995,7 @@ function abrirModalEditar(id) {
   document.getElementById('editTipo').value = t.tipo || 'Personal';
   document.getElementById('editPrioridad').value = t.prioridad || 'Media';
   document.getElementById('editRepeticion').value = t.repeticion || 'Una vez';
+  document.getElementById('editInvitado').value = t.invitadoEmail || '';
   document.getElementById('modalEditar').classList.add('activo');
 }
 
