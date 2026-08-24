@@ -260,10 +260,9 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
     </div>
 
     <div id="buscador" class="buscador" style="display:none;">
-      <input id="inputBuscar" type="text" placeholder="Buscar tarea..." oninput="buscarTareas()">
+      <input id="inputBuscar" type="text" placeholder="Buscar por nombre, tipo, prioridad o fecha..." oninput="buscarTareas()">
     </div>
 
-    <!-- FORMULARIO DE NUEVA TAREA (CON REPETICIÓN RESTAURADA) -->
     <div id="formulario" class="formulario" style="display:none;">
       <h2>Nueva tarea</h2>
       <label>¿Qué tenés que hacer?</label>
@@ -317,7 +316,6 @@ body { font-family: Gadugi, "Segoe UI", sans-serif; background: var(--fondo); co
   </div>
 </main>
 
-<!-- MODAL DE EDICIÓN (CON REPETICIÓN RESTAURADA) -->
 <div id="modalEditar" class="modalOverlay">
   <div class="modal">
     <div class="modalHeader">
@@ -658,6 +656,7 @@ function mostrarSeccion(seccion) {
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
+  else if (seccion === 'buscar') { buscarTareas(); }
   else if (seccion === 'nueva') { document.getElementById('lista').innerHTML = ''; }
   else renderizarSegunSeccion();
 }
@@ -685,6 +684,7 @@ function renderizar(lista) {
     let mensaje = 'No tenés tareas pendientes.';
     if (seccionActual === 'pospuestas') mensaje = 'No tenés tareas pospuestas.';
     if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
+    if (seccionActual === 'buscar') mensaje = 'Ingresá un término o no se encontraron tareas.';
     contenedor.innerHTML = `<div class="card">${mensaje}</div>`;
     return;
   }
@@ -763,7 +763,32 @@ function renderizarCalendario() {
     } else { numero = i - inicio + 1; }
 
     const key = yearCelda + '-' + String(mesCelda + 1).padStart(2, '0') + '-' + String(numero).padStart(2, '0');
-    const tareasDia = tareas.filter(t => t.fechaKey === key);
+    const fechaCelda = new Date(yearCelda, mesCelda, numero);
+
+    const tareasDia = tareas.filter(t => {
+      if (!t.fechaKey) return false;
+      
+      const partes = t.fechaKey.split('-');
+      const fechaOrigen = new Date(partes[0], partes[1] - 1, partes[2]);
+      
+      if (t.fechaKey === key) return true;
+      if (!t.repeticion || t.repeticion === 'Una vez' || fechaCelda < fechaOrigen) return false;
+
+      if (t.repetirHasta) {
+        const partesLímite = t.repetirHasta.split('-');
+        const fechaLimite = new Date(partesLímite[0], partesLímite[1] - 1, partesLímite[2]);
+        if (fechaCelda > fechaLimite) return false;
+      }
+
+      const diaSemana = fechaCelda.getDay();
+
+      if (t.repeticion === 'Diaria') return true;
+      if (t.repeticion === 'Lunes a viernes') return diaSemana >= 1 && diaSemana <= 5;
+      if (t.repeticion === 'Semanal') return fechaCelda.getDay() === fechaOrigen.getDay();
+      if (t.repeticion === 'Mensual') return fechaCelda.getDate() === fechaOrigen.getDate();
+
+      return false;
+    });
 
     html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}"><div class="calNumero">${numero}</div>`;
 
@@ -787,7 +812,10 @@ function irAMesActual() { calendarioFecha = new Date(); renderizarCalendario(); 
 
 function buscarTareas() {
   const texto = document.getElementById('inputBuscar').value.toLowerCase().trim();
-  if (texto === '') { document.getElementById('lista').innerHTML = `<div class="card">Escribí algo para buscar.</div>`; return; }
+  if (texto === '') { 
+    renderizar(tareas); 
+    return; 
+  }
   const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey].join(' ').toLowerCase().includes(texto));
   renderizar(resultados);
 }
