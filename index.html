@@ -113,13 +113,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .main.expandido { margin-left: 0; }
 
 .header { background: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--v5); }
-.headerIzda { display: flex; align-items: center; gap: 12px; margin-left: 35px; }
+.headerIzda { display: flex; align-items: center; gap: 10px; margin-left: 35px; }
 .tituloHeader { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .fecha { color: var(--v2); font-size: 13px; font-weight: 500; }
 
-.btnHeaderAccion { background: #f0ebf8; border: 1px solid var(--v5); font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 6px; color: var(--v1); transition: background .2s; }
-.btnHeaderAccion:hover { background: var(--v5); }
-.btnHeaderAccion svg { width: 16px; height: 16px; fill: currentColor; }
+.btnIconoHeader { background: #f0ebf8; border: 1px solid var(--v5); font-size: 18px; cursor: pointer; padding: 8px 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--v1); transition: background .2s; }
+.btnIconoHeader:hover { background: var(--v5); }
+.btnIconoHeader svg { width: 18px; height: 18px; fill: currentColor; }
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
@@ -144,7 +144,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .formulario { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .formulario h2 { margin-top: 0; font-size: 20px; font-weight: 700; }
 .formulario label { display: block; margin-top: 14px; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
-.formulario input, .formulario select { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; font-family: 'Inter', sans-serif; }
+.formulario input, .formulario select, .formulario textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; font-family: 'Inter', sans-serif; }
 .filaFormulario { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .btnGuardar { width: 100%; margin-top: 20px; background: var(--v1); color: white; border: none; border-radius: 10px; padding: 14px; cursor: pointer; font-weight: 600; font-size: 16px; }
 
@@ -163,6 +163,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .dot-reunion { background: var(--t-reunion); }
 .dot-seguimiento { background: var(--t-seguimiento); }
 .detalle { color: var(--v2); font-size: 13px; }
+.observacion { color: var(--v1); font-size: 13px; margin-top: 6px; background: #f7f5fa; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); }
 
 .fechaTarea { display: inline-block; margin-top: 8px; color: var(--v2); font-size: 12px; font-weight: 500; }
 .fechaTareaResaltada { background: #f0ebf8; color: var(--v1); font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--v5); font-size: 12px; }
@@ -202,12 +203,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .calCelda.hoy { border: 2px solid var(--v3); }
 .calNumero { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
 
+/* BANNERS DEL CALENDARIO CON COLORES POR TIPO */
 .calTarea { 
   display: block; 
   padding: 4px 6px; 
   margin-bottom: 3px; 
   border-radius: 6px; 
-  color: var(--v1); 
   font-size: 10px; 
   font-weight: 600;
   overflow: hidden; 
@@ -215,14 +216,14 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   text-overflow: ellipsis; 
   border-left: 4px solid var(--v4);
   background: var(--v5);
+  color: var(--v1);
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .calTarea.tipo-trabajo { background: var(--bg-trabajo); color: #2c2250; }
 .calTarea.tipo-personal { background: var(--bg-personal); color: #4a148c; }
 .calTarea.tipo-f043 { background: var(--bg-f043); color: #880e4f; }
-.calTarea.tipo-reunión { background: var(--bg-reunion); color: #01579b; }
-.calTarea.tipo-reunion { background: var(--bg-reunion); color: #01579b; }
+.calTarea.tipo-reunion, .calTarea.tipo-reunión { background: var(--bg-reunion); color: #01579b; }
 .calTarea.tipo-seguimiento { background: var(--bg-seguimiento); color: #004d40; }
 
 .calTarea.p-alta { border-left-color: var(--p-alta); }
@@ -238,7 +239,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .modalHeader h3 { margin: 0; font-weight: 700; }
 .btnCloseModal { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--v2); }
 .modalBody label { display: block; margin-top: 10px; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
-.modalBody input, .modalBody select { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; }
+.modalBody input, .modalBody select, .modalBody textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
 .modalFooter { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
 .btnEliminar { background: #e63946; color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
 .btnGuardarModal { background: var(--v1); color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
@@ -301,12 +302,11 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   <header class="header">
     <div class="headerIzda">
       <div class="tituloHeader" id="tituloHeader">Mis tareas</div>
-      <button id="btnNotif" class="btnHeaderAccion" onclick="toggleNotificaciones()" title="Notificaciones">
+      <button id="btnNotif" class="btnIconoHeader" onclick="toggleNotificaciones()" title="Notificaciones">
         <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
       </button>
-      <button id="btnPip" class="btnHeaderAccion" onclick="togglePipWidget()" title="Abrir ventana flotante">
+      <button id="btnPip" class="btnIconoHeader" onclick="togglePipWidget()" title="Ventana flotante">
         <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/></svg>
-        <span>Abrir flotante</span>
       </button>
     </div>
     <div class="fecha" id="fecha"></div>
@@ -375,6 +375,8 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
           <input id="nuevaRepetirHasta" type="date">
         </div>
       </div>
+      <label>Observaciones (opcional)</label>
+      <textarea id="nuevaObservacion" rows="2" placeholder="Agregar detalles u observaciones..."></textarea>
       <label>Compartir con amigo (Gmail)</label>
       <input id="nuevoInvitado" type="email" placeholder="amigo@gmail.com (opcional)" list="listaInvitadosGuardados">
       <button class="btnGuardar" onclick="guardarNuevaTarea()">Guardar tarea</button>
@@ -432,6 +434,8 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         <option>Semanal</option>
         <option>Mensual (Antepenúltimo día hábil)</option>
       </select>
+      <label>Observaciones</label>
+      <textarea id="editObservacion" rows="2" placeholder="Agregar detalles u observaciones..."></textarea>
       <label>Compartir con amigo (Gmail)</label>
       <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados">
     </div>
@@ -592,6 +596,7 @@ async function guardarNuevaTarea() {
   const prioridad = document.getElementById('nuevaPrioridad').value;
   const repeticion = document.getElementById('nuevaRepeticion').value;
   const repetirHasta = document.getElementById('nuevaRepetirHasta').value;
+  const observacion = document.getElementById('nuevaObservacion').value.trim();
   const invitadoEmail = document.getElementById('nuevoInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Escribí una tarea y fecha.'); return; }
@@ -606,12 +611,13 @@ async function guardarNuevaTarea() {
       creadorEmail: currentUser.email || '',
       invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
-      estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
+      observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
     });
 
     document.getElementById('nuevaTarea').value = '';
     document.getElementById('nuevaHora').value = '';
     document.getElementById('nuevaRepetirHasta').value = '';
+    document.getElementById('nuevaObservacion').value = '';
     document.getElementById('nuevoInvitado').value = '';
     mostrarToastUI('Tarea creada.');
     mostrarSeccion('hoy');
@@ -632,7 +638,7 @@ async function guardarTareaRapida() {
       creadorEmail: currentUser.email || '',
       invitadoEmail: '',
       tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
-      estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
+      observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now()
     });
     input.value = '';
     mostrarToastUI('Tarea rápida añadida.');
@@ -693,6 +699,7 @@ async function guardarEdicionModal() {
   const tipo = document.getElementById('editTipo').value;
   const prioridad = document.getElementById('editPrioridad').value;
   const repeticion = document.getElementById('editRepeticion').value;
+  const observacion = document.getElementById('editObservacion').value.trim();
   const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
@@ -700,7 +707,7 @@ async function guardarEdicionModal() {
   if (invitadoEmail) await guardarContactoSiNuevo(invitadoEmail);
 
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, invitadoEmail });
+  await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, observacion, invitadoEmail });
   cerrarModalEditar();
   mostrarToastUI('Tarea actualizada.');
 }
@@ -1003,6 +1010,7 @@ function crearTarjeta(tarea) {
           <span class="dotTipo ${tipoClase}"></span>
           ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
         </div>
+        ${tarea.observacion ? `<div class="observacion">${escapar(tarea.observacion)}</div>` : ''}
         <div>
           <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey || '')}</span>
         </div>
@@ -1065,8 +1073,9 @@ function renderizarCalendario() {
 
     tareasDia.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || ''))).forEach(t => {
       const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
-      const tipoNormalizado = String(t.tipo || 'personal').toLowerCase().trim();
-      const tipoClase = 'tipo-' + tipoNormalizado;
+      
+      let tipoLimpio = String(t.tipo || 'personal').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '');
+      const tipoClase = 'tipo-' + tipoLimpio;
       const estaCompletadaEnEseDia = estaTareaCompletaEnFecha(t, key);
 
       html += `
@@ -1094,7 +1103,7 @@ function buscarTareas() {
     renderizar(tareas); 
     return; 
   }
-  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey, t.invitadoEmail].join(' ').toLowerCase().includes(texto));
+  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey, t.invitadoEmail, t.observacion].join(' ').toLowerCase().includes(texto));
   renderizar(resultados);
 }
 
@@ -1108,6 +1117,7 @@ function abrirModalEditar(id) {
   document.getElementById('editTipo').value = t.tipo || 'Personal';
   document.getElementById('editPrioridad').value = t.prioridad || 'Media';
   document.getElementById('editRepeticion').value = t.repeticion || 'Una vez';
+  document.getElementById('editObservacion').value = t.observacion || '';
   document.getElementById('editInvitado').value = t.invitadoEmail || '';
   document.getElementById('modalEditar').classList.add('activo');
 }
@@ -1116,7 +1126,6 @@ function cerrarModalEditar() { document.getElementById('modalEditar').classList.
 function confirmarEliminarModal() { cerrarModalEditar(); document.getElementById('modalConfirmar').classList.add('activo'); }
 function cerrarModalConfirmar() { document.getElementById('modalConfirmar').classList.remove('activo'); }
 
-/* VENTANA FLOTANTE / WIDGET PIP */
 async function togglePipWidget() {
   if (pipWindow) {
     pipWindow.close();
