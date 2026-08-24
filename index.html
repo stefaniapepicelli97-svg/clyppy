@@ -5,10 +5,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<!-- NUEVAS LÍNEAS ANTI-CACHÉ -->
+<!-- ANTI-CACHÉ PARA ACTUALIZACIÓN AUTOMÁTICA -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -197,11 +195,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnEditarAccion:hover { background: var(--v5); }
 .btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
 
-.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+/* ESTILOS DEL CALENDARIO OPTIMIZADO PARA PC Y CELULARES */
+.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); overflow-x: auto; }
 .calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .calHeader h2 { margin: 0; font-size: 18px; font-weight: 700; }
 .calNav { display: flex; gap: 6px; }
 .calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; font-weight: 500; }
+
 .calGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .calDiaSemana { text-align: center; font-size: 11px; font-weight: 600; color: var(--v2); padding: 6px 0; }
 .calCelda { min-height: 80px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; transition: background 0.2s; }
@@ -254,6 +254,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
 .toast.visible { opacity: 1; transform: translateY(0); }
 
+/* AJUSTES RESPONSIVOS PARA PANTALLAS DE CELULAR */
 @media(max-width: 768px) {
   .sidebar { transform: translateX(-245px); }
   .sidebar.visibleMobile { transform: translateX(0); }
@@ -265,6 +266,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   .numero { font-size: 22px; }
   .titulo { font-size: 11px; }
   .filaFormulario { grid-template-columns: 1fr; gap: 0; }
+
+  /* CALENDARIO CELULAR ADAPTADO */
+  .calendario { padding: 10px 8px; }
+  .calGrid { min-width: 580px; gap: 4px; }
+  .calCelda { min-height: 68px; padding: 3px; }
+  .calNumero { font-size: 10px; }
+  .calTarea { font-size: 9px; padding: 3px 4px; margin-bottom: 2px; }
 }
 </style>
 </head>
