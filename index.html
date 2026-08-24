@@ -126,6 +126,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnIconoHeader:hover { background: var(--v5); }
 .btnIconoHeader svg { width: 18px; height: 18px; fill: currentColor; }
 
+/* EL BOTÓN PIP SOLO SE MUESTRA EN PC */
+#btnPip { display: none; }
+@media(min-width: 769px) {
+  #btnPip { display: flex; }
+}
+
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
 .resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
@@ -168,9 +174,9 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .dot-reunion { background: var(--t-reunion); }
 .dot-seguimiento { background: var(--t-seguimiento); }
 .detalle { color: var(--v2); font-size: 13px; }
-.observacion { color: var(--v1); font-size: 13px; margin-top: 6px; background: #f7f5fa; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); }
+.observacion { color: var(--v1); font-size: 13px; margin-top: 6px; background: #f7f5fa; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); word-break: break-word; }
 
-/* ESTILOS DEL CRONÓMETRO Y TIEMPO TRABAJADO */
+/* CRONÓMETRO Y ETIQUETAS */
 .badgeTiempo { display: inline-flex; align-items: center; gap: 4px; background: #e0f2f1; color: #004d40; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-left: 8px; }
 .badgeTiempo.corriendo { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; animation: pulseGlow 1.5s infinite; }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); } 70% { box-shadow: 0 0 0 6px rgba(76,175,80,0); } 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); } }
@@ -200,36 +206,35 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnEditarAccion:hover { background: var(--v5); }
 .btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
 
-/* ESTILOS DEL CALENDARIO OPTIMIZADO PARA PC Y CELULARES */
-.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); overflow-x: auto; }
+/* ESTILOS DEL CALENDARIO REDISEÑADO PARA CELULARES Y PC */
+.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .calHeader h2 { margin: 0; font-size: 18px; font-weight: 700; }
 .calNav { display: flex; gap: 6px; }
 .calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; font-weight: 500; }
 
-.calGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-.calDiaSemana { text-align: center; font-size: 11px; font-weight: 600; color: var(--v2); padding: 6px 0; }
-.calCelda { min-height: 80px; border: 1px solid #eee; border-radius: 8px; padding: 4px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; transition: background 0.2s; }
+.calGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.calDiaSemana { text-align: center; font-size: 12px; font-weight: 700; color: var(--v2); padding: 4px 0; }
+.calCelda { min-height: 75px; border: 1px solid #eee; border-radius: 8px; padding: 3px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: background 0.2s; }
 .calCelda:hover { background: #fdfbff; }
 .calCelda.otroMes { opacity: .35; }
-.calCelda.hoy { border: 2px solid var(--v3); }
-.calNumero { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+.calCelda.hoy { border: 2px solid var(--v3); background: #faf8fd; }
+.calNumero { font-size: 11px; font-weight: 700; margin-bottom: 2px; color: var(--v1); }
 
-/* BANNERS DEL CALENDARIO CON COLORES POR TIPO */
+/* BANNERS ADAPTATIVOS DE TAREAS EN CALENDARIO */
 .calTarea { 
   display: block; 
-  padding: 4px 6px; 
-  margin-bottom: 3px; 
-  border-radius: 6px; 
+  padding: 3px 4px; 
+  margin-bottom: 2px; 
+  border-radius: 5px; 
   font-size: 10px; 
   font-weight: 600;
   overflow: hidden; 
   white-space: nowrap; 
   text-overflow: ellipsis; 
-  border-left: 4px solid var(--v4);
+  border-left: 3px solid var(--v4);
   background: var(--v5);
   color: var(--v1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .calTarea.tipo-trabajo { background: var(--bg-trabajo); color: #2c2250; }
@@ -244,7 +249,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
-/* MODALES OPTIMIZADOS PARA CELULAR Y TECLADO VIRTUAL */
+/* MODALES RESPONSIVOS CON MANEJO DE TECLADO VIRTUAL */
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
 .modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -261,7 +266,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
 .toast.visible { opacity: 1; transform: translateY(0); }
 
-/* AJUSTES RESPONSIVOS PARA PANTALLAS DE CELULAR */
+/* AJUSTES RESPONSIVOS EN CELULARES CHICOS */
 @media(max-width: 768px) {
   .sidebar { transform: translateX(-245px); }
   .sidebar.visibleMobile { transform: translateX(0); }
@@ -274,12 +279,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   .titulo { font-size: 11px; }
   .filaFormulario { grid-template-columns: 1fr; gap: 0; }
 
-  /* CALENDARIO CELULAR ADAPTADO */
-  .calendario { padding: 10px 8px; }
-  .calGrid { min-width: 580px; gap: 4px; }
-  .calCelda { min-height: 68px; padding: 3px; }
-  .calNumero { font-size: 10px; }
-  .calTarea { font-size: 9px; padding: 3px 4px; margin-bottom: 2px; }
+  /* CALENDARIO PERFECTO EN CELULAR */
+  .calendario { padding: 10px 4px; }
+  .calGrid { gap: 2px; }
+  .calCelda { min-height: 60px; padding: 2px; border-radius: 5px; }
+  .calNumero { font-size: 10px; margin-bottom: 1px; }
+  .calTarea { font-size: 8px; padding: 2px 2px; border-left-width: 2px; line-height: 1.1; margin-bottom: 1px; }
 }
 </style>
 </head>
@@ -327,7 +332,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <button id="btnNotif" class="btnIconoHeader" onclick="toggleNotificaciones()" title="Notificaciones">
         <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
       </button>
-      <button id="btnPip" class="btnIconoHeader" onclick="togglePipWidget()" title="Ventana flotante">
+      <button id="btnPip" class="btnIconoHeader" onclick="togglePipWidget()" title="Ventana flotante (PC)">
         <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/></svg>
       </button>
     </div>
@@ -423,7 +428,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 <div id="modalEditar" class="modalOverlay">
   <div class="modal">
     <div class="modalHeader">
-      <h3>Editar tarea</h3>
+      <h3>Editar / Ver tarea</h3>
       <button class="btnCloseModal" onclick="cerrarModalEditar()">✕</button>
     </div>
     <div class="modalBody">
@@ -456,7 +461,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         <option>Semanal</option>
         <option>Mensual (Antepenúltimo día hábil)</option>
       </select>
-      <label>Observaciones</label>
+      <label>Observaciones (Podés editar o agregar notas)</label>
       <textarea id="editObservacion" rows="3" placeholder="Agregar detalles u observaciones..." onblur="window.scrollTo(0, 0)"></textarea>
       <label>Compartir con amigo (Gmail)</label>
       <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados" onblur="window.scrollTo(0, 0)">
@@ -476,12 +481,11 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   </div>
 </div>
 
-<!-- MODAL CONFIRMAR ACCIÓN DE SERIE RECURRENTE -->
 <div id="modalRecurrente" class="modalOverlay">
   <div class="modal" style="max-width: 400px;">
     <div class="modalHeader"><h3 id="tituloModalRecurrente">Tarea recurrente</h3></div>
     <div class="modalBody">
-      <p style="margin: 5px 0 15px; color: var(--v2); font-size: 14px;" id="descModalRecurrente">Esta tarea forma parte de una serie que se repite. ¿Cómo querés aplicar este cambio?</p>
+      <p style="margin: 5px 0 15px; color: var(--v2); font-size: 14px;" id="descModalRecurrente">Esta tarea se repite. ¿Cómo querés aplicar el cambio?</p>
     </div>
     <div class="modalFooter" style="flex-direction: column; gap: 8px;">
       <button class="btnGuardarModal" style="width: 100%;" onclick="ejecutarAccionRecurrente('solo_esta')">Aplicar solo a esta fecha</button>
@@ -539,8 +543,8 @@ function iniciar() {
 function registrarServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker registrado:', reg.scope))
-      .catch(err => console.error('Service Worker error:', err));
+      .then(reg => console.log('Service Worker ok:', reg.scope))
+      .catch(err => console.error('Service Worker err:', err));
   }
 }
 
@@ -661,7 +665,7 @@ async function guardarNuevaTarea() {
     const { collection, addDoc } = window.fbFunctions;
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
-      creadorEmail: currentUser.email || '',
+      creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
@@ -689,7 +693,7 @@ async function guardarTareaRapida() {
     const { collection, addDoc } = window.fbFunctions;
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
-      creadorEmail: currentUser.email || '',
+      creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: '',
       tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
       observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
@@ -735,7 +739,7 @@ async function toggleTimerTarea(id) {
   const corriendo = tareas.find(x => x.timerInicio && x.id !== id);
   if (corriendo) {
     let acumuladoCorriendo = Number(corriendo.tiempoAcumuladoSec || 0);
-    const deltaCorriendo = Math.floor((ahora - corriendo.timerInicio) / 1000);
+    const deltaCorriendo = Math.floor((ahora - corriendo.tiempoAcumuladoSec) / 1000);
     await updateDoc(doc(window.fbDb, "tareas", corriendo.id), {
       tiempoAcumuladoSec: acumuladoCorriendo + deltaCorriendo,
       timerInicio: null
@@ -808,7 +812,6 @@ async function quitarPosponer(id) {
   mostrarToastUI('Restaurada.');
 }
 
-// MANEJO DE EDICIÓN Y ELIMINACIÓN RECURRENTE
 function procesarGuardarModal() {
   const id = document.getElementById('editId').value;
   const t = tareas.find(x => x.id === id);
@@ -874,23 +877,20 @@ async function guardarEdicionModal(modoRecurrencia) {
   const { doc, updateDoc, collection, addDoc } = window.fbFunctions;
 
   if (modoRecurrencia === 'solo_esta') {
-    // Si elige "Solo a esta", creamos una copia individual para esta fecha
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
-      creadorEmail: currentUser.email || '',
+      creadorEmail: t.creadorEmail || (currentUser.email || '').toLowerCase(),
       invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion: 'Una vez', repetirHasta: '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       tiempoAcumuladoSec: Number(t.tiempoAcumuladoSec || 0), timerInicio: null
     });
 
-    // Desvinculamos esta fecha de la serie original guardándola como completada/omitida
     let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
     if (!completadas.includes(fecha)) completadas.push(fecha);
     await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
 
   } else {
-    // Si elige "Todas las demás", actualizamos directamente la tarea base
     await updateDoc(doc(window.fbDb, "tareas", id), {
       tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, observacion, invitadoEmail
     });
@@ -1206,7 +1206,10 @@ function crearTarjeta(tarea) {
   const estaPospuesta = tarea.posponerHasta && Number(tarea.posponerHasta) > ahora;
   const horaPospuesta = estaPospuesta ? new Date(Number(tarea.posponerHasta)).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
   const estaHechaHoy = estaTareaCompletaEnFecha(tarea, hoy);
-  const esInvitado = tarea.invitadoEmail && currentUser && tarea.invitadoEmail === currentUser.email.toLowerCase();
+  
+  const userEmailNorm = currentUser ? (currentUser.email || '').toLowerCase() : '';
+  const esInvitado = tarea.invitadoEmail && tarea.invitadoEmail === userEmailNorm;
+  const esCreadorConInvitado = tarea.invitadoEmail && tarea.creadorEmail === userEmailNorm;
   
   const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
   const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
@@ -1227,14 +1230,15 @@ function crearTarjeta(tarea) {
           ${escapar(tarea.hora || 'Sin horario')}
           ${tieneTiempo ? `<span class="badgeTiempo ${estaCorriendo ? 'corriendo' : ''}" id="timer-display-${tarea.id}">⏱️ ${formatearSegundos(segAcumulados)}</span>` : ''}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
-          ${esInvitado ? `<span class="tagInvitado">Compartida con vos</span>` : ''}
+          ${esInvitado ? `<span class="tagInvitado">Compartida con vos por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
+          ${esCreadorConInvitado ? `<span class="tagInvitado">Compartida con ${escapar(tarea.invitadoEmail)}</span>` : ''}
         </div>
         <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
         <div class="detalle">
           <span class="dotTipo ${tipoClase}"></span>
           ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
         </div>
-        ${tarea.observacion ? `<div class="observacion">${escapar(tarea.observacion)}</div>` : ''}
+        ${tarea.observacion ? `<div class="observacion">📝 <strong>Observaciones:</strong> ${escapar(tarea.observacion)}</div>` : ''}
         <div>
           <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey || '')}</span>
         </div>
@@ -1370,7 +1374,7 @@ async function togglePipWidget() {
   }
 
   if (!('documentPictureInPicture' in window)) {
-    mostrarToastUI("Tu navegador no soporta ventana flotante (usa Chrome/Edge).");
+    mostrarToastUI("Tu navegador no soporta ventana flotante (usá Chrome/Edge en PC).");
     return;
   }
 
