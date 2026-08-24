@@ -27,7 +27,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB8TTasWFGNGaHeI0J_LYYwAgXzEH98kHo",
@@ -48,7 +48,7 @@
   window.fbProvider = provider;
   window.fbSignIn = () => signInWithPopup(auth, provider);
   window.fbSignOut = () => signOut(auth);
-  window.fbFunctions = { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or };
+  window.fbFunctions = { collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where, or, setDoc, getDoc };
 </script>
 
 <style>
@@ -117,9 +117,9 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .tituloHeader { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .fecha { color: var(--v2); font-size: 13px; font-weight: 500; }
 
-.btnNotif { background: #f0ebf8; border: 1px solid var(--v5); font-size: 18px; cursor: pointer; padding: 8px 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--v1); transition: background .2s; }
-.btnNotif:hover { background: var(--v5); }
-.btnNotif svg { width: 18px; height: 18px; fill: currentColor; }
+.btnHeaderAccion { background: #f0ebf8; border: 1px solid var(--v5); font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; gap: 6px; color: var(--v1); transition: background .2s; }
+.btnHeaderAccion:hover { background: var(--v5); }
+.btnHeaderAccion svg { width: 16px; height: 16px; fill: currentColor; }
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
@@ -163,7 +163,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .dot-reunion { background: var(--t-reunion); }
 .dot-seguimiento { background: var(--t-seguimiento); }
 .detalle { color: var(--v2); font-size: 13px; }
-.fechaTarea { display: inline-block; margin-top: 6px; color: var(--v2); font-size: 12px; }
+
+.fechaTarea { display: inline-block; margin-top: 8px; color: var(--v2); font-size: 12px; font-weight: 500; }
+.fechaTareaResaltada { background: #f0ebf8; color: var(--v1); font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--v5); font-size: 12px; }
+
 .tagPospuesta { background: var(--v5); color: var(--v1); font-weight: 600; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-left: 6px; font-size: 11px; }
 .tagInvitado { background: #e1f5fe; color: #01579b; font-weight: 600; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-left: 6px; font-size: 11px; }
 
@@ -298,8 +301,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   <header class="header">
     <div class="headerIzda">
       <div class="tituloHeader" id="tituloHeader">Mis tareas</div>
-      <button id="btnNotif" class="btnNotif" onclick="toggleNotificaciones()" title="Notificaciones">
+      <button id="btnNotif" class="btnHeaderAccion" onclick="toggleNotificaciones()" title="Notificaciones">
         <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      </button>
+      <button id="btnPip" class="btnHeaderAccion" onclick="togglePipWidget()" title="Abrir ventana flotante">
+        <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/></svg>
+        <span>Abrir flotante</span>
       </button>
     </div>
     <div class="fecha" id="fecha"></div>
@@ -355,7 +362,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         <div>
           <label>Repetición</label>
           <select id="nuevaRepeticion" onchange="toggleRepetirHasta()">
-            <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+            <option>Una vez</option>
+            <option>Diaria</option>
+            <option>Lunes a viernes</option>
+            <option>Día por medio (días hábiles)</option>
+            <option>Semanal</option>
+            <option>Mensual (Antepenúltimo día hábil)</option>
           </select>
         </div>
         <div id="colRepetirHasta" style="display:none;">
@@ -364,7 +376,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         </div>
       </div>
       <label>Compartir con amigo (Gmail)</label>
-      <input id="nuevoInvitado" type="email" placeholder="amigo@gmail.com (opcional)">
+      <input id="nuevoInvitado" type="email" placeholder="amigo@gmail.com (opcional)" list="listaInvitadosGuardados">
       <button class="btnGuardar" onclick="guardarNuevaTarea()">Guardar tarea</button>
     </div>
 
@@ -413,10 +425,15 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       </div>
       <label>Repetición</label>
       <select id="editRepeticion">
-        <option>Una vez</option><option>Diaria</option><option>Lunes a viernes</option><option>Semanal</option><option>Mensual</option>
+        <option>Una vez</option>
+        <option>Diaria</option>
+        <option>Lunes a viernes</option>
+        <option>Día por medio (días hábiles)</option>
+        <option>Semanal</option>
+        <option>Mensual (Antepenúltimo día hábil)</option>
       </select>
       <label>Compartir con amigo (Gmail)</label>
-      <input id="editInvitado" type="email" placeholder="amigo@gmail.com">
+      <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados">
     </div>
     <div class="modalFooter">
       <button class="btnEliminar" onclick="confirmarEliminarModal()">Eliminar</button>
@@ -439,16 +456,20 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   </div>
 </div>
 
+<datalist id="listaInvitadosGuardados"></datalist>
+
 <div id="toast" class="toast"></div>
 
 <script>
 let currentUser = null;
 let tareas = [];
+let contactosGuardados = [];
 let seccionActual = 'hoy';
 let calendarioFecha = new Date();
 let notifPermiso = false;
 let notificadosMap = {};
 let unsubscribeSnapshot = null;
+let pipWindow = null;
 
 document.addEventListener('DOMContentLoaded', iniciar);
 
@@ -476,12 +497,14 @@ function esperarFirebase() {
         document.getElementById('userName').textContent = user.displayName || user.email;
         document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/34';
         escucharTareasUsuario();
+        cargarContactosGuardados();
       } else {
         currentUser = null;
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('userProfile').style.display = 'none';
         if (unsubscribeSnapshot) unsubscribeSnapshot();
         tareas = [];
+        contactosGuardados = [];
         actualizarUI();
       }
     });
@@ -529,6 +552,38 @@ function escucharTareasUsuario() {
   });
 }
 
+async function cargarContactosGuardados() {
+  if (!currentUser) return;
+  try {
+    const { doc, getDoc } = window.fbFunctions;
+    const ref = doc(window.fbDb, "contactos", currentUser.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists() && Array.isArray(snap.data().emails)) {
+      contactosGuardados = snap.data().emails;
+      actualizarDatalistInvitados();
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function guardarContactoSiNuevo(email) {
+  if (!email || !currentUser) return;
+  const emailNorm = email.trim().toLowerCase();
+  if (!emailNorm || contactosGuardados.includes(emailNorm)) return;
+
+  contactosGuardados.push(emailNorm);
+  actualizarDatalistInvitados();
+
+  try {
+    const { doc, setDoc } = window.fbFunctions;
+    await setDoc(doc(window.fbDb, "contactos", currentUser.uid), { emails: contactosGuardados });
+  } catch(e) { console.error(e); }
+}
+
+function actualizarDatalistInvitados() {
+  const datalist = document.getElementById('listaInvitadosGuardados');
+  datalist.innerHTML = contactosGuardados.map(e => `<option value="${e}"></option>`).join('');
+}
+
 async function guardarNuevaTarea() {
   const tarea = document.getElementById('nuevaTarea').value.trim();
   const fecha = document.getElementById('nuevaFecha').value;
@@ -543,6 +598,8 @@ async function guardarNuevaTarea() {
 
   mostrarToastUI('Guardando...');
   try {
+    if (invitadoEmail) await guardarContactoSiNuevo(invitadoEmail);
+
     const { collection, addDoc } = window.fbFunctions;
     await addDoc(collection(window.fbDb, "tareas"), {
       userId: currentUser.uid,
@@ -639,6 +696,8 @@ async function guardarEdicionModal() {
   const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
 
   if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
+
+  if (invitadoEmail) await guardarContactoSiNuevo(invitadoEmail);
 
   const { doc, updateDoc } = window.fbFunctions;
   await updateDoc(doc(window.fbDb, "tareas", id), { tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, invitadoEmail });
@@ -739,6 +798,40 @@ function estaTareaCompletaEnFecha(t, fechaKey) {
   return false;
 }
 
+function esDiaHabil(f) {
+  const d = f.getDay();
+  return d >= 1 && d <= 5;
+}
+
+function obtenerAntepenultimoDiaHabil(year, month) {
+  const ultimoDia = new Date(year, month + 1, 0);
+  let habilesEncontrados = 0;
+  let cursor = new Date(ultimoDia);
+
+  while (cursor.getDate() > 0) {
+    if (esDiaHabil(cursor)) {
+      habilesEncontrados++;
+      if (habilesEncontrados === 3) {
+        return cursor.getDate();
+      }
+    }
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return 25;
+}
+
+function contarDiasHabilesEntre(fInicio, fObjetivo) {
+  let count = 0;
+  let cur = new Date(fInicio);
+  cur.setDate(cur.getDate() + 1);
+
+  while (cur <= fObjetivo) {
+    if (esDiaHabil(cur)) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+
 function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
   if (!t.fechaKey) return false;
   
@@ -758,8 +851,19 @@ function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
 
   if (t.repeticion === 'Diaria') return true;
   if (t.repeticion === 'Lunes a viernes') return diaSemana >= 1 && diaSemana <= 5;
+
+  if (t.repeticion.includes('Día por medio')) {
+    if (!esDiaHabil(fechaCelda)) return false;
+    const habilesTranscurridos = contarDiasHabilesEntre(fechaOrigen, fechaCelda);
+    return habilesTranscurridos % 2 === 0;
+  }
+
   if (t.repeticion === 'Semanal') return fechaCelda.getDay() === fechaOrigen.getDay();
-  if (t.repeticion === 'Mensual') return fechaCelda.getDate() === fechaOrigen.getDate();
+
+  if (t.repeticion.includes('Mensual')) {
+    const antepenultimo = obtenerAntepenultimoDiaHabil(fechaCelda.getFullYear(), fechaCelda.getMonth());
+    return fechaCelda.getDate() === antepenultimo;
+  }
 
   return false;
 }
@@ -770,6 +874,8 @@ function actualizarUI() {
   if (seccionActual === 'calendario') renderizarCalendario();
   else if (seccionActual === 'buscar') buscarTareas();
   else if (seccionActual !== 'nueva') renderizarSegunSeccion();
+
+  if (pipWindow) renderizarPipWidget();
 }
 
 function actualizarContadores() {
@@ -882,6 +988,8 @@ function crearTarjeta(tarea) {
   const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
   const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
 
+  const esModoBuscar = seccionActual === 'buscar';
+
   return `
     <div class="tarea ${prioClase}" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">
       <div class="info">
@@ -895,7 +1003,9 @@ function crearTarjeta(tarea) {
           <span class="dotTipo ${tipoClase}"></span>
           ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
         </div>
-        <div class="fechaTarea">${escapar(tarea.fechaKey || '')}</div>
+        <div>
+          <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey || '')}</span>
+        </div>
       </div>
       <div class="acciones" onclick="event.stopPropagation()">
         ${!estaHechaHoy ? `<button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>` : ''}
@@ -1005,6 +1115,70 @@ function abrirModalEditar(id) {
 function cerrarModalEditar() { document.getElementById('modalEditar').classList.remove('activo'); }
 function confirmarEliminarModal() { cerrarModalEditar(); document.getElementById('modalConfirmar').classList.add('activo'); }
 function cerrarModalConfirmar() { document.getElementById('modalConfirmar').classList.remove('activo'); }
+
+/* VENTANA FLOTANTE / WIDGET PIP */
+async function togglePipWidget() {
+  if (pipWindow) {
+    pipWindow.close();
+    pipWindow = null;
+    return;
+  }
+
+  if (!('documentPictureInPicture' in window)) {
+    mostrarToastUI("Tu navegador no soporta ventana flotante (usa Chrome/Edge).");
+    return;
+  }
+
+  try {
+    pipWindow = await window.documentPictureInPicture.requestWindow({
+      width: 320,
+      height: 480
+    });
+
+    const style = pipWindow.document.createElement('style');
+    style.textContent = `
+      body { font-family: 'Inter', sans-serif; background: #231942; color: white; margin: 0; padding: 12px; }
+      h3 { font-size: 15px; margin: 0 0 10px 0; color: #E0B1CB; display: flex; justify-content: space-between; align-items: center; }
+      .item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 4px solid #BE95C4; font-size: 12px; }
+      .item.p-alta { border-left-color: #e63946; }
+      .item.p-media { border-left-color: #f4a261; }
+      .item.p-baja { border-left-color: #2a9d8f; }
+      .hora { font-weight: bold; color: #E0B1CB; margin-bottom: 2px; }
+      .nombre { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+      .btn { background: #5E548E; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+    `;
+    pipWindow.document.head.appendChild(style);
+
+    pipWindow.addEventListener('pagehide', () => { pipWindow = null; });
+    renderizarPipWidget();
+  } catch(e) {
+    mostrarToastUI("Error al abrir ventana flotante.");
+  }
+}
+
+function renderizarPipWidget() {
+  if (!pipWindow) return;
+  const hoy = obtenerHoyKey();
+  const fechaHoyObj = new Date();
+  const deHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
+
+  let html = `<h3>Clyppy Hoy (${deHoy.length})</h3>`;
+  if (deHoy.length === 0) {
+    html += `<div class="item">¡Todo listo por hoy!</div>`;
+  } else {
+    deHoy.forEach(t => {
+      const prio = 'p-' + String(t.prioridad || 'media').toLowerCase();
+      html += `
+        <div class="item ${prio}">
+          <div class="hora">${t.hora || 'Sin hora'}</div>
+          <div class="nombre">${escapar(t.tarea)}</div>
+          <button class="btn" onclick="window.opener.marcarHecho('${t.id}')">Hecho</button>
+        </div>
+      `;
+    });
+  }
+  pipWindow.document.body.innerHTML = html;
+}
 
 let toastTimer = null;
 function mostrarToastUI(mensaje) {
