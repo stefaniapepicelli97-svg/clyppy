@@ -126,7 +126,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnIconoHeader:hover { background: var(--v5); }
 .btnIconoHeader svg { width: 18px; height: 18px; fill: currentColor; }
 
-/* EL BOTÓN PIP SOLO SE MUESTRA EN PC */
 #btnPip { display: none; }
 @media(min-width: 769px) {
   #btnPip { display: flex; }
@@ -134,7 +133,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
-.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+.resumen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
 .card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; cursor: pointer; transition: transform 0.2s; }
 .card:hover { transform: translateY(-2px); }
 .numero { font-size: 26px; font-weight: 700; color: var(--v1); }
@@ -206,7 +205,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnEditarAccion:hover { background: var(--v5); }
 .btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
 
-/* ESTILOS DEL CALENDARIO REDISEÑADO PARA CELULARES Y PC */
+/* CALENDARIO */
 .calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .calHeader h2 { margin: 0; font-size: 18px; font-weight: 700; }
@@ -221,7 +220,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .calCelda.hoy { border: 2px solid var(--v3); background: #faf8fd; }
 .calNumero { font-size: 11px; font-weight: 700; margin-bottom: 2px; color: var(--v1); }
 
-/* BANNERS ADAPTATIVOS DE TAREAS EN CALENDARIO */
 .calTarea { 
   display: block; 
   padding: 3px 4px; 
@@ -249,7 +247,15 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
-/* MODALES RESPONSIVOS CON MANEJO DE TECLADO VIRTUAL */
+/* SECCIÓN GUÍA DE USO */
+.guiaContainer { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.guiaContainer h2 { margin-top: 0; color: var(--v1); font-size: 22px; }
+.guiaItem { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+.guiaItem:last-child { border-bottom: none; }
+.guiaTitulo { font-weight: 700; font-size: 16px; color: var(--v2); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.guiaTexto { font-size: 14px; color: #444; line-height: 1.5; }
+
+/* MODALES */
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
 .modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -266,20 +272,18 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
 .toast.visible { opacity: 1; transform: translateY(0); }
 
-/* AJUSTES RESPONSIVOS EN CELULARES CHICOS */
 @media(max-width: 768px) {
   .sidebar { transform: translateX(-245px); }
   .sidebar.visibleMobile { transform: translateX(0); }
   .main { margin-left: 0 !important; }
   .toggleSidebar { left: 12px !important; }
   .sidebar.visibleMobile ~ .toggleSidebar { left: 226px !important; }
-  .resumen { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .resumen { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .card { padding: 12px 6px; }
   .numero { font-size: 22px; }
   .titulo { font-size: 11px; }
   .filaFormulario { grid-template-columns: 1fr; gap: 0; }
 
-  /* CALENDARIO PERFECTO EN CELULAR */
   .calendario { padding: 10px 4px; }
   .calGrid { gap: 2px; }
   .calCelda { min-height: 60px; padding: 2px; border-radius: 5px; }
@@ -316,10 +320,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
-    <button id="menuPospuestas" onclick="mostrarSeccion('pospuestas')">Pospuestas</button>
     <button id="menuBuscar" onclick="mostrarSeccion('buscar')">Buscar tareas</button>
     <button id="menuNueva" onclick="mostrarSeccion('nueva')">Nueva tarea</button>
     <button id="menuCompletadas" onclick="mostrarSeccion('completadas')">Completadas</button>
+    <button id="menuGuia" onclick="mostrarSeccion('guia')">Cómo usar</button>
   </div>
 </aside>
 
@@ -343,7 +347,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     <div class="resumen">
       <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
       <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
-      <div class="card" onclick="mostrarSeccion('pospuestas')"><div class="numero" id="pospuestas">0</div><div class="titulo">Pospuestas</div></div>
     </div>
 
     <div id="progresoContainer" class="progresoContainer">
@@ -419,6 +422,30 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         </div>
       </div>
       <div id="calGrid" class="calGrid"></div>
+    </div>
+
+    <div id="guiaSection" class="guiaContainer" style="display:none;">
+      <h2>Guía de uso de Clyppy 📎</h2>
+      
+      <div class="guiaItem">
+        <div class="guiaTitulo">🖥️ Ventana Flotante (Mini App en PC)</div>
+        <div class="guiaTexto">Hacé clic en el botón con el ícono de ventana en la barra superior. Se abrirá un panel desplegable que quedará **siempre visible por encima de tus otras aplicaciones** mientras trabajás en Chrome o Edge.</div>
+      </div>
+
+      <div class="guiaItem">
+        <div class="guiaTitulo">🤝 Tareas Compartidas y Colaborativas</div>
+        <div class="guiaTexto">Podés agregar el correo Gmail de un compañero al crear o editar una tarea. Tanto vos como tu invitado podrán modificar detalles y agregar observaciones en tiempo real.</div>
+      </div>
+
+      <div class="guiaItem">
+        <div class="guiaTitulo">🔔 Notificaciones Inteligentes</div>
+        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de la hora fijada de tus tareas, y avisos inmediatos si un colaborador hace cambios o escribe observaciones.</div>
+      </div>
+
+      <div class="guiaItem">
+        <div class="guiaTitulo">⏱️ Cronómetro de Tareas</div>
+        <div class="guiaTexto">Iniciá y pausá el medidor de tiempo con el botón **▶ Iniciar** para registrar exactamente cuánto tiempo le dedicás a cada actividad durante el día.</div>
+      </div>
     </div>
 
     <div id="lista"></div>
@@ -513,11 +540,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 <script>
 let currentUser = null;
 let tareas = [];
+let tareasAnterioresEstado = {};
 let contactosGuardados = [];
 let seccionActual = 'hoy';
 let calendarioFecha = new Date();
 let notifPermiso = false;
 let notificadosMap = {};
+let notificados5MinMap = {};
 let unsubscribeSnapshot = null;
 let pipWindow = null;
 let accionPendienteRecurrente = null;
@@ -566,6 +595,7 @@ function esperarFirebase() {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
         tareas = [];
         contactosGuardados = [];
+        tareasAnterioresEstado = {};
         actualizarUI();
       }
     });
@@ -605,12 +635,49 @@ function escucharTareasUsuario() {
   );
 
   unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-    tareas = [];
+    let nuevasTareas = [];
     snapshot.forEach((docSnap) => {
-      tareas.push({ id: docSnap.id, ...docSnap.data() });
+      nuevasTareas.push({ id: docSnap.id, ...docSnap.data() });
     });
+
+    detectarCambiosYNotificar(nuevasTareas);
+    tareas = nuevasTareas;
     actualizarUI();
   });
+}
+
+function detectarCambiosYNotificar(nuevasTareas) {
+  if (Object.keys(tareasAnterioresEstado).length > 0 && notifPermiso) {
+    const userEmailNorm = (currentUser.email || '').toLowerCase();
+
+    nuevasTareas.forEach(nT => {
+      const prev = tareasAnterioresEstado[nT.id];
+      if (prev) {
+        const cambioTexto = prev.tarea !== nT.tarea || prev.fechaKey !== nT.fechaKey || prev.hora !== nT.hora || prev.prioridad !== nT.prioridad;
+        const cambioObs = prev.observacion !== nT.observacion;
+
+        if (cambioTexto || cambioObs) {
+          lanzarNotificacion("Clyppy: Tarea modificada", `Se actualizó "${nT.tarea}".`);
+        }
+      }
+    });
+  }
+
+  tareasAnterioresEstado = {};
+  nuevasTareas.forEach(t => {
+    tareasAnterioresEstado[t.id] = { ...t };
+  });
+}
+
+function lanzarNotificacion(titulo, cuerpo) {
+  if (!notifPermiso) return;
+  if ("Notification" in window && Notification.permission === "granted") {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(titulo, { body: cuerpo, requireInteraction: true });
+    }).catch(() => {
+      new Notification(titulo, { body: cuerpo, requireInteraction: true });
+    });
+  }
 }
 
 async function cargarContactosGuardados() {
@@ -806,12 +873,6 @@ async function manana(id) {
   mostrarToastUI('Para mañana.');
 }
 
-async function quitarPosponer(id) {
-  const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: '' });
-  mostrarToastUI('Restaurada.');
-}
-
 function procesarGuardarModal() {
   const id = document.getElementById('editId').value;
   const t = tareas.find(x => x.id === id);
@@ -961,21 +1022,23 @@ function revisarNotificaciones() {
   const hoyStr = obtenerHoyKey();
   const horaActualStr = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
 
+  const en5Min = new Date(ahora.getTime() + 5 * 60000);
+  const horaEn5MinStr = String(en5Min.getHours()).padStart(2, '0') + ':' + String(en5Min.getMinutes()).padStart(2, '0');
+
   tareas.forEach(function(t) {
     if (t.estado === 'Completada') return;
+
+    if (t.fechaKey === hoyStr && t.hora === horaEn5MinStr) {
+      if (!notificados5MinMap[t.id]) {
+        notificados5MinMap[t.id] = true;
+        lanzarNotificacion("Clyppy: En 5 minutos", `${t.tarea} (${t.hora} hs)`);
+      }
+    }
+
     if (t.fechaKey === hoyStr && t.hora === horaActualStr) {
       if (!notificadosMap[t.id]) {
         notificadosMap[t.id] = true;
-        if ("Notification" in window && Notification.permission === "granted") {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification("Clyppy", {
-              body: `${t.tarea} (${t.tipo || 'General'})`,
-              requireInteraction: true
-            });
-          }).catch(() => {
-            new Notification("Clyppy", { body: `${t.tarea} (${t.tipo || 'General'})`, requireInteraction: true });
-          });
-        }
+        lanzarNotificacion("Clyppy: ¡Ahora!", `${t.tarea}`);
       }
     }
   });
@@ -1096,23 +1159,20 @@ function actualizarUI() {
   actualizarProgreso();
   if (seccionActual === 'calendario') renderizarCalendario();
   else if (seccionActual === 'buscar') buscarTareas();
-  else if (seccionActual !== 'nueva') renderizarSegunSeccion();
+  else if (seccionActual !== 'nueva' && seccionActual !== 'guia') renderizarSegunSeccion();
 
   if (pipWindow) renderizarPipWidget();
 }
 
 function actualizarContadores() {
   const hoy = obtenerHoyKey();
-  const ahora = Date.now();
   const fechaHoyObj = new Date();
 
   const pendientesHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
-  const pospuestas = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
   const urgentesHoy = pendientesHoy.filter(t => String(t.prioridad || '').toLowerCase().includes('alta'));
 
   document.getElementById('total').textContent = pendientesHoy.length;
   document.getElementById('urgentes').textContent = urgentesHoy.length;
-  document.getElementById('pospuestas').textContent = pospuestas.length;
 }
 
 function actualizarProgreso() {
@@ -1151,39 +1211,37 @@ function mostrarSeccion(seccion) {
     document.getElementById('toggleSidebar').textContent = '›';
   }
 
-  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', pospuestas: 'menuPospuestas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas' };
+  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
   if (mapa[seccion]) document.getElementById(mapa[seccion]).classList.add('activo');
 
   document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
   document.getElementById('formulario').style.display = seccion === 'nueva' ? 'block' : 'none';
   document.getElementById('calendario').style.display = seccion === 'calendario' ? 'block' : 'none';
+  document.getElementById('guiaSection').style.display = seccion === 'guia' ? 'block' : 'none';
   document.getElementById('quickAdd').style.display = seccion === 'hoy' ? 'flex' : 'none';
   document.getElementById('progresoContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', pospuestas: 'Pospuestas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas' };
+  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
   else if (seccion === 'buscar') { buscarTareas(); }
-  else if (seccion === 'nueva') { document.getElementById('lista').innerHTML = ''; }
+  else if (seccion === 'nueva' || seccion === 'guia') { document.getElementById('lista').innerHTML = ''; }
   else renderizarSegunSeccion();
 }
 
 function renderizarSegunSeccion() {
-  const ahora = Date.now();
   const hoy = obtenerHoyKey();
   const fechaHoyObj = new Date();
   let lista = [];
 
   if (seccionActual === 'hoy') {
     lista = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
-  } else if (seccionActual === 'pospuestas') {
-    lista = tareas.filter(t => t.estado !== 'Completada' && t.posponerHasta && Number(t.posponerHasta) > ahora);
   } else if (seccionActual === 'completadas') {
     lista = tareas.filter(t => t.estado === 'Completada' || (Array.isArray(t.completadasFechas) && t.completadasFechas.length > 0));
   }
 
-  lista.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || '')));
+  lista.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
   renderizar(lista);
 }
 
@@ -1191,7 +1249,6 @@ function renderizar(lista) {
   const contenedor = document.getElementById('lista');
   if (!lista || lista.length === 0) {
     let mensaje = 'No tenés tareas pendientes.';
-    if (seccionActual === 'pospuestas') mensaje = 'No tenés tareas pospuestas.';
     if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
     if (seccionActual === 'buscar') mensaje = 'Ingresá un término o no se encontraron tareas.';
     contenedor.innerHTML = `<div class="card">${mensaje}</div>`;
@@ -1230,7 +1287,7 @@ function crearTarjeta(tarea) {
           ${escapar(tarea.hora || 'Sin horario')}
           ${tieneTiempo ? `<span class="badgeTiempo ${estaCorriendo ? 'corriendo' : ''}" id="timer-display-${tarea.id}">⏱️ ${formatearSegundos(segAcumulados)}</span>` : ''}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
-          ${esInvitado ? `<span class="tagInvitado">Compartida con vos por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
+          ${esInvitado ? `<span class="tagInvitado">Compartida por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
           ${esCreadorConInvitado ? `<span class="tagInvitado">Compartida con ${escapar(tarea.invitadoEmail)}</span>` : ''}
         </div>
         <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
@@ -1250,7 +1307,6 @@ function crearTarjeta(tarea) {
           </button>
           <button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>
         ` : ''}
-        ${seccionActual === 'pospuestas' || estaPospuesta ? `<button class="volver" onclick="quitarPosponer('${escaparJS(tarea.id)}')">Restaurar</button>` : ''}
         ${seccionActual === 'hoy' && !estaHechaHoy ? `
           <button class="posponer" onclick="posponer15('${escaparJS(tarea.id)}')">+15m</button>
           <button class="posponer" onclick="posponer60('${escaparJS(tarea.id)}')">+1h</button>
@@ -1304,7 +1360,7 @@ function renderizarCalendario() {
 
     html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}" onclick="crearTareaDesdeCalendario('${key}')"><div class="calNumero">${numero}</div>`;
 
-    tareasDia.sort((a, b) => String(a.hora || '').localeCompare(String(b.hora || ''))).forEach(t => {
+    tareasDia.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99'))).forEach(t => {
       const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
       
       let tipoLimpio = String(t.tipo || 'personal').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '');
@@ -1387,14 +1443,15 @@ async function togglePipWidget() {
     const style = pipWindow.document.createElement('style');
     style.textContent = `
       body { font-family: 'Inter', sans-serif; background: #231942; color: white; margin: 0; padding: 12px; }
-      h3 { font-size: 15px; margin: 0 0 10px 0; color: #E0B1CB; display: flex; justify-content: space-between; align-items: center; }
+      h3 { font-size: 16px; margin: 0 0 12px 0; color: #E0B1CB; font-weight: 700; }
       .item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 4px solid #BE95C4; font-size: 12px; }
       .item.p-alta { border-left-color: #e63946; }
       .item.p-media { border-left-color: #f4a261; }
       .item.p-baja { border-left-color: #2a9d8f; }
       .hora { font-weight: bold; color: #E0B1CB; margin-bottom: 2px; }
-      .nombre { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-      .btn { background: #5E548E; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+      .nombre { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+      .btn { background: #5E548E; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+      .btn:hover { background: #9F86C0; }
     `;
     pipWindow.document.head.appendChild(style);
 
@@ -1411,7 +1468,9 @@ function renderizarPipWidget() {
   const fechaHoyObj = new Date();
   const deHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
 
-  let html = `<h3>Clyppy Hoy (${deHoy.length})</h3>`;
+  deHoy.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
+
+  let html = `<h3>Hoy (${deHoy.length})</h3>`;
   if (deHoy.length === 0) {
     html += `<div class="item">¡Todo listo por hoy!</div>`;
   } else {
