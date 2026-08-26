@@ -175,7 +175,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .detalle { color: var(--v2); font-size: 13px; }
 .observacion { color: var(--v1); font-size: 13px; margin-top: 6px; background: #f7f5fa; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); word-break: break-word; }
 
-/* CRONÓMETRO Y ETIQUETAS */
 .badgeTiempo { display: inline-flex; align-items: center; gap: 4px; background: #e0f2f1; color: #004d40; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-left: 8px; }
 .badgeTiempo.corriendo { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; animation: pulseGlow 1.5s infinite; }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); } 70% { box-shadow: 0 0 0 6px rgba(76,175,80,0); } 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); } }
@@ -205,7 +204,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnEditarAccion:hover { background: var(--v5); }
 .btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
 
-/* CALENDARIO */
 .calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .calHeader h2 { margin: 0; font-size: 18px; font-weight: 700; }
@@ -247,7 +245,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
-/* SECCIÓN GUÍA DE USO */
 .guiaContainer { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .guiaContainer h2 { margin-top: 0; color: var(--v1); font-size: 22px; }
 .guiaItem { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
@@ -255,7 +252,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .guiaTitulo { font-weight: 700; font-size: 16px; color: var(--v2); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .guiaTexto { font-size: 14px; color: #444; line-height: 1.5; }
 
-/* MODALES */
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
 .modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -271,6 +267,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
 .toast.visible { opacity: 1; transform: translateY(0); }
+
+.historialLista { background: #f7f5fa; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 12px; max-height: 120px; overflow-y: auto; border: 1px solid var(--v4); }
+.historialFila { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; }
+.historialFila:last-child { border-bottom: none; }
 
 @media(max-width: 768px) {
   .sidebar { transform: translateX(-245px); }
@@ -439,12 +439,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
       <div class="guiaItem">
         <div class="guiaTitulo">🔔 Notificaciones Inteligentes</div>
-        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de la hora fijada de tus tareas, y avisos inmediatos si un colaborador hace cambios o escribe observaciones.</div>
+        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de tus tareas tipo **Reunión**, además de notificaciones a la hora exacta para los demás tipos y avisos inmediatos si un colaborador actualiza una tarea.</div>
       </div>
 
       <div class="guiaItem">
-        <div class="guiaTitulo">⏱️ Cronómetro de Tareas</div>
-        <div class="guiaTexto">Iniciá y pausá el medidor de tiempo con el botón **▶ Iniciar** para registrar exactamente cuánto tiempo le dedicás a cada actividad durante el día.</div>
+        <div class="guiaTitulo">⏱️ Cronómetro e Historial de Tiempo por Día</div>
+        <div class="guiaTexto">Iniciá y pausá el medidor con **▶ Iniciar**. En las tareas recurrentes, el tiempo se guarda **independiente para cada día** para que puedas analizar tu rendimiento diario.</div>
       </div>
     </div>
 
@@ -494,8 +494,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados" onblur="window.scrollTo(0, 0)">
       
       <div style="margin-top: 15px; padding: 10px; background: #f0ebf8; border-radius: 8px; font-size: 13px; color: var(--v1); display: flex; justify-content: space-between; align-items: center;">
-        <span>⏱️ Tiempo acumulado: <strong id="editTiempoAcumulado">0m 0s</strong></span>
-        <button onclick="resetearTiempoModal()" style="background: var(--v5); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-weight: 600;">Resetear</button>
+        <span>⏱️ Tiempo de hoy: <strong id="editTiempoAcumulado">0m 0s</strong></span>
+        <button onclick="resetearTiempoModal()" style="background: var(--v5); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-weight: 600;">Resetear hoy</button>
+      </div>
+
+      <div id="seccionHistorialTiempo" style="margin-top: 10px; display:none;">
+        <label>📊 Historial de tiempo por fecha:</label>
+        <div class="historialLista" id="historialLista"></div>
       </div>
     </div>
     <div class="modalFooter">
@@ -565,7 +570,7 @@ function iniciar() {
     document.getElementById('toggleSidebar').textContent = '›';
   }
 
-  setInterval(revisarNotificaciones, 10000);
+  setInterval(revisarNotificaciones, 5000);
   setInterval(actualizarTimersEnVivo, 1000);
 }
 
@@ -648,7 +653,6 @@ function escucharTareasUsuario() {
 
 function detectarCambiosYNotificar(nuevasTareas) {
   if (Object.keys(tareasAnterioresEstado).length > 0 && notifPermiso) {
-    const userEmailNorm = (currentUser.email || '').toLowerCase();
 
     nuevasTareas.forEach(nT => {
       const prev = tareasAnterioresEstado[nT.id];
@@ -736,7 +740,7 @@ async function guardarNuevaTarea() {
       invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
-      tiempoAcumuladoSec: 0, timerInicio: null
+      registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
 
     document.getElementById('nuevaTarea').value = '';
@@ -764,11 +768,18 @@ async function guardarTareaRapida() {
       invitadoEmail: '',
       tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
       observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
-      tiempoAcumuladoSec: 0, timerInicio: null
+      registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
     input.value = '';
     mostrarToastUI('Tarea rápida añadida.');
   } catch (e) { mostrarToastUI('Error al guardar.'); }
+}
+
+function obtenerSegundosDeFecha(tarea, fechaKey) {
+  if (tarea.registrosTiempo && typeof tarea.registrosTiempo[fechaKey] === 'number') {
+    return tarea.registrosTiempo[fechaKey];
+  }
+  return Number(tarea.tiempoAcumuladoSec || 0);
 }
 
 async function marcarHecho(id) {
@@ -778,20 +789,23 @@ async function marcarHecho(id) {
   const hoy = obtenerHoyKey();
   const { doc, updateDoc } = window.fbFunctions;
 
-  let tiempoAcumulado = Number(t.tiempoAcumuladoSec || 0);
-  if (t.timerInicio) {
+  let registros = { ...(t.registrosTiempo || {}) };
+  let acumuladoHoy = obtenerSegundosDeFecha(t, hoy);
+
+  if (t.timerInicio && (t.timerFechaKey === hoy || (!t.timerFechaKey && t.fechaKey === hoy))) {
     const delta = Math.floor((Date.now() - t.timerInicio) / 1000);
-    tiempoAcumulado += delta;
+    acumuladoHoy += delta;
   }
+  registros[hoy] = acumuladoHoy;
 
   if (t.repeticion && t.repeticion !== 'Una vez') {
     let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
     if (!completadas.includes(hoy)) {
       completadas.push(hoy);
     }
-    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas, timerInicio: null, tiempoAcumuladoSec: tiempoAcumulado });
+    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas, timerInicio: null, timerFechaKey: null, registrosTiempo: registros });
   } else {
-    await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada', timerInicio: null, tiempoAcumuladoSec: tiempoAcumulado });
+    await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada', timerInicio: null, timerFechaKey: null, registrosTiempo: registros });
   }
   mostrarToastUI('Completada.');
 }
@@ -802,28 +816,40 @@ async function toggleTimerTarea(id) {
 
   const { doc, updateDoc } = window.fbFunctions;
   const ahora = Date.now();
+  const hoy = obtenerHoyKey();
 
   const corriendo = tareas.find(x => x.timerInicio && x.id !== id);
   if (corriendo) {
-    let acumuladoCorriendo = Number(corriendo.tiempoAcumuladoSec || 0);
-    const deltaCorriendo = Math.floor((ahora - corriendo.tiempoAcumuladoSec) / 1000);
+    const fKeyCorriendo = corriendo.timerFechaKey || corriendo.fechaKey || hoy;
+    let regCorriendo = { ...(corriendo.registrosTiempo || {}) };
+    let acumCorriendo = obtenerSegundosDeFecha(corriendo, fKeyCorriendo);
+    const deltaCorriendo = Math.floor((ahora - corriendo.timerInicio) / 1000);
+    regCorriendo[fKeyCorriendo] = acumCorriendo + deltaCorriendo;
+
     await updateDoc(doc(window.fbDb, "tareas", corriendo.id), {
-      tiempoAcumuladoSec: acumuladoCorriendo + deltaCorriendo,
-      timerInicio: null
+      registrosTiempo: regCorriendo,
+      timerInicio: null,
+      timerFechaKey: null
     });
   }
 
   if (t.timerInicio) {
-    let acumulado = Number(t.tiempoAcumuladoSec || 0);
+    const fKeyCurrent = t.timerFechaKey || hoy;
+    let reg = { ...(t.registrosTiempo || {}) };
+    let acum = obtenerSegundosDeFecha(t, fKeyCurrent);
     const delta = Math.floor((ahora - t.timerInicio) / 1000);
+    reg[fKeyCurrent] = acum + delta;
+
     await updateDoc(doc(window.fbDb, "tareas", id), {
-      tiempoAcumuladoSec: acumulado + delta,
-      timerInicio: null
+      registrosTiempo: reg,
+      timerInicio: null,
+      timerFechaKey: null
     });
     mostrarToastUI('Tiempo pausado.');
   } else {
     await updateDoc(doc(window.fbDb, "tareas", id), {
-      timerInicio: ahora
+      timerInicio: ahora,
+      timerFechaKey: hoy
     });
     mostrarToastUI('Tiempo iniciado.');
   }
@@ -840,11 +866,13 @@ function formatearSegundos(seg) {
 
 function actualizarTimersEnVivo() {
   const ahora = Date.now();
+  const hoy = obtenerHoyKey();
   tareas.forEach(t => {
     if (t.timerInicio) {
       const el = document.getElementById(`timer-display-${t.id}`);
       if (el) {
-        const acumulado = Number(t.tiempoAcumuladoSec || 0);
+        const fKey = t.timerFechaKey || hoy;
+        const acumulado = obtenerSegundosDeFecha(t, fKey);
         const transcurrido = Math.floor((ahora - t.timerInicio) / 1000);
         el.textContent = '⏱️ ' + formatearSegundos(acumulado + transcurrido);
       }
@@ -944,7 +972,7 @@ async function guardarEdicionModal(modoRecurrencia) {
       invitadoEmail: invitadoEmail,
       tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion: 'Una vez', repetirHasta: '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
-      tiempoAcumuladoSec: Number(t.tiempoAcumuladoSec || 0), timerInicio: null
+      registrosTiempo: t.registrosTiempo || {}, timerInicio: null
     });
 
     let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
@@ -984,10 +1012,17 @@ async function ejecutarEliminacion(modoRecurrencia) {
 
 async function resetearTiempoModal() {
   const id = document.getElementById('editId').value;
+  const t = tareas.find(x => x.id === id);
+  if (!t) return;
+
+  const hoy = obtenerHoyKey();
+  let reg = { ...(t.registrosTiempo || {}) };
+  reg[hoy] = 0;
+
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { tiempoAcumuladoSec: 0, timerInicio: null });
+  await updateDoc(doc(window.fbDb, "tareas", id), { registrosTiempo: reg, timerInicio: null, timerFechaKey: null, tiempoAcumuladoSec: 0 });
   document.getElementById('editTiempoAcumulado').textContent = '0m 0s';
-  mostrarToastUI('Tiempo reseteado.');
+  mostrarToastUI('Tiempo de hoy reseteado.');
 }
 
 function comprobarNotificacionesIncapacidad() {
@@ -1011,7 +1046,9 @@ function toggleNotificaciones() {
       document.getElementById('btnNotif').style.background = 'var(--v5)';
       mostrarToastUI("Notificaciones activadas.");
     } else {
-      mostrarToastUI("Permiso denegado.");
+      notifPermiso = false;
+      document.getElementById('btnNotif').style.background = '#f0ebf8';
+      mostrarToastUI("Permiso denegado en el navegador.");
     }
   });
 }
@@ -1028,17 +1065,18 @@ function revisarNotificaciones() {
   tareas.forEach(function(t) {
     if (t.estado === 'Completada') return;
 
-    if (t.fechaKey === hoyStr && t.hora === horaEn5MinStr) {
+    const esTipoReunion = String(t.tipo || '').toLowerCase().includes('reuni');
+    if (esTipoReunion && t.fechaKey === hoyStr && t.hora === horaEn5MinStr) {
       if (!notificados5MinMap[t.id]) {
         notificados5MinMap[t.id] = true;
-        lanzarNotificacion("Clyppy: En 5 minutos", `${t.tarea} (${t.hora} hs)`);
+        lanzarNotificacion("Clyppy: Reunión en 5 minutos 📅", `${t.tarea} (${t.hora} hs)`);
       }
     }
 
     if (t.fechaKey === hoyStr && t.hora === horaActualStr) {
       if (!notificadosMap[t.id]) {
         notificadosMap[t.id] = true;
-        lanzarNotificacion("Clyppy: ¡Ahora!", `${t.tarea}`);
+        lanzarNotificacion("Clyppy: ¡Hora de la tarea!", `${t.tarea}`);
       }
     }
   });
@@ -1274,8 +1312,8 @@ function crearTarjeta(tarea) {
   const esModoBuscar = seccionActual === 'buscar';
 
   const estaCorriendo = Boolean(tarea.timerInicio);
-  let segAcumulados = Number(tarea.tiempoAcumuladoSec || 0);
-  if (estaCorriendo) {
+  let segAcumulados = obtenerSegundosDeFecha(tarea, hoy);
+  if (estaCorriendo && (tarea.timerFechaKey === hoy || (!tarea.timerFechaKey && tarea.fechaKey === hoy))) {
     segAcumulados += Math.floor((ahora - tarea.timerInicio) / 1000);
   }
   const tieneTiempo = segAcumulados > 0 || estaCorriendo;
@@ -1399,6 +1437,8 @@ function buscarTareas() {
 function abrirModalEditar(id) {
   const t = tareas.find(x => x.id === id);
   if (!t) return;
+
+  const hoy = obtenerHoyKey();
   document.getElementById('editId').value = t.id;
   document.getElementById('editTarea').value = t.tarea;
   document.getElementById('editFecha').value = t.fechaKey;
@@ -1409,11 +1449,29 @@ function abrirModalEditar(id) {
   document.getElementById('editObservacion').value = t.observacion || '';
   document.getElementById('editInvitado').value = t.invitadoEmail || '';
 
-  let totalSeg = Number(t.tiempoAcumuladoSec || 0);
-  if (t.timerInicio) {
-    totalSeg += Math.floor((Date.now() - t.timerInicio) / 1000);
+  let totalSegHoy = obtenerSegundosDeFecha(t, hoy);
+  if (t.timerInicio && (t.timerFechaKey === hoy || (!t.timerFechaKey && t.fechaKey === hoy))) {
+    totalSegHoy += Math.floor((Date.now() - t.timerInicio) / 1000);
   }
-  document.getElementById('editTiempoAcumulado').textContent = formatearSegundos(totalSeg);
+  document.getElementById('editTiempoAcumulado').textContent = formatearSegundos(totalSegHoy);
+
+  // Renderizar historial de tiempos si existen registros
+  const secHistorial = document.getElementById('seccionHistorialTiempo');
+  const listaHistorial = document.getElementById('historialLista');
+  const regTiempo = t.registrosTiempo || {};
+  const fechasReg = Object.keys(regTiempo).sort().reverse();
+
+  if (fechasReg.length > 0) {
+    secHistorial.style.display = 'block';
+    listaHistorial.innerHTML = fechasReg.map(f => `
+      <div class="historialFila">
+        <span>📅 ${f}</span>
+        <strong>${formatearSegundos(regTiempo[f])}</strong>
+      </div>
+    `).join('');
+  } else {
+    secHistorial.style.display = 'none';
+  }
 
   document.getElementById('modalEditar').classList.add('activo');
 }
