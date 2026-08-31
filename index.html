@@ -245,6 +245,16 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
+/* SECCIÓN ESTADÍSTICAS */
+.statsContainer { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.statsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.statBox { background: #f7f5fa; border-radius: 12px; padding: 16px; border: 1px solid var(--v5); text-align: center; }
+.statNum { font-size: 24px; font-weight: 700; color: var(--v1); }
+.statLabel { font-size: 12px; color: var(--v2); font-weight: 600; margin-top: 4px; }
+.topLista { background: #fff; border-radius: 10px; padding: 10px; border: 1px solid #eee; }
+.topItem { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0ebf8; font-size: 13px; }
+.topItem:last-child { border-bottom: none; }
+
 .guiaContainer { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
 .guiaContainer h2 { margin-top: 0; color: var(--v1); font-size: 22px; }
 .guiaItem { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
@@ -320,6 +330,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
+    <button id="menuEstadisticas" onclick="mostrarSeccion('estadisticas')">Estadísticas</button>
     <button id="menuBuscar" onclick="mostrarSeccion('buscar')">Buscar tareas</button>
     <button id="menuNueva" onclick="mostrarSeccion('nueva')">Nueva tarea</button>
     <button id="menuCompletadas" onclick="mostrarSeccion('completadas')">Completadas</button>
@@ -344,7 +355,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   </header>
 
   <div class="contenedor">
-    <div class="resumen">
+    <div id="resumenGrid" class="resumen">
       <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
       <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
     </div>
@@ -424,6 +435,29 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <div id="calGrid" class="calGrid"></div>
     </div>
 
+    <div id="estadisticasSection" class="statsContainer" style="display:none;">
+      <h2>Análisis de tiempo y productividad 📊</h2>
+      <div class="statsGrid">
+        <div class="statBox">
+          <div class="statNum" id="statTiempoHoy">0m</div>
+          <div class="statLabel">Invertido hoy</div>
+        </div>
+        <div class="statBox">
+          <div class="statNum" id="statTiempoSemana">0h</div>
+          <div class="statLabel">Invertido esta semana</div>
+        </div>
+        <div class="statBox">
+          <div class="statNum" id="statTiempoTotal">0h</div>
+          <div class="statLabel">Tiempo total acumulado</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px; font-size:16px;">🔥 Top Tareas que más tiempo consumen:</h3>
+      <div class="topLista" id="topTareasLista">
+        <div class="topItem">No hay suficientes datos de tiempo registrados aún.</div>
+      </div>
+    </div>
+
     <div id="guiaSection" class="guiaContainer" style="display:none;">
       <h2>Guía de uso de Clyppy 📎</h2>
       
@@ -439,12 +473,12 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
       <div class="guiaItem">
         <div class="guiaTitulo">🔔 Notificaciones Inteligentes</div>
-        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de tus tareas tipo **Reunión**, además de notificaciones a la hora exacta para los demás tipos y avisos inmediatos si un colaborador actualiza una tarea.</div>
+        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de tus tareas tipo **Reunión**, además de notificaciones a la hora exacta para todas las tareas activas de hoy.</div>
       </div>
 
       <div class="guiaItem">
         <div class="guiaTitulo">⏱️ Cronómetro e Historial de Tiempo por Día</div>
-        <div class="guiaTexto">Iniciá y pausá el medidor con **▶ Iniciar**. En las tareas recurrentes, el tiempo se guarda **independiente para cada día** para que puedas analizar tu rendimiento diario.</div>
+        <div class="guiaTexto">Iniciá y pausá el medidor con **▶ Iniciar**. En las tareas recurrentes, el tiempo se guarda **independiente para cada día** para que puedas analizar tu rendimiento diario en la pestaña Estadísticas.</div>
       </div>
     </div>
 
@@ -653,7 +687,6 @@ function escucharTareasUsuario() {
 
 function detectarCambiosYNotificar(nuevasTareas) {
   if (Object.keys(tareasAnterioresEstado).length > 0 && notifPermiso) {
-
     nuevasTareas.forEach(nT => {
       const prev = tareasAnterioresEstado[nT.id];
       if (prev) {
@@ -674,13 +707,21 @@ function detectarCambiosYNotificar(nuevasTareas) {
 }
 
 function lanzarNotificacion(titulo, cuerpo) {
-  if (!notifPermiso) return;
-  if ("Notification" in window && Notification.permission === "granted") {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification(titulo, { body: cuerpo, requireInteraction: true });
-    }).catch(() => {
-      new Notification(titulo, { body: cuerpo, requireInteraction: true });
-    });
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  try {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(titulo, { body: cuerpo, icon: '/favicon.ico' });
+      }).catch(() => {
+        new Notification(titulo, { body: cuerpo });
+      });
+    } else {
+      new Notification(titulo, { body: cuerpo });
+    }
+  } catch(e) {
+    console.error("Error al lanzar notificacion:", e);
   }
 }
 
@@ -799,7 +840,7 @@ async function marcarHecho(id) {
   registros[hoy] = acumuladoHoy;
 
   if (t.repeticion && t.repeticion !== 'Una vez') {
-    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    let completadas = Array.isArray(t.completadasFechas) ? [...t.completadasFechas] : [];
     if (!completadas.includes(hoy)) {
       completadas.push(hoy);
     }
@@ -975,7 +1016,7 @@ async function guardarEdicionModal(modoRecurrencia) {
       registrosTiempo: t.registrosTiempo || {}, timerInicio: null
     });
 
-    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    let completadas = Array.isArray(t.completadasFechas) ? [...t.completadasFechas] : [];
     if (!completadas.includes(fecha)) completadas.push(fecha);
     await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
 
@@ -997,8 +1038,8 @@ async function ejecutarEliminacion(modoRecurrencia) {
   const { doc, deleteDoc, updateDoc } = window.fbFunctions;
 
   if (modoRecurrencia === 'solo_esta') {
-    const hoy = t.fechaKey || obtenerHoyKey();
-    let completadas = Array.isArray(t.completadasFechas) ? t.completadasFechas : [];
+    const hoy = obtenerHoyKey();
+    let completadas = Array.isArray(t.completadasFechas) ? [...t.completadasFechas] : [];
     if (!completadas.includes(hoy)) completadas.push(hoy);
     await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas });
     cerrarModalEditar();
@@ -1044,6 +1085,7 @@ function toggleNotificaciones() {
     if (permission === "granted") {
       notifPermiso = true;
       document.getElementById('btnNotif').style.background = 'var(--v5)';
+      lanzarNotificacion("Clyppy", "¡Notificaciones activadas con éxito!");
       mostrarToastUI("Notificaciones activadas.");
     } else {
       notifPermiso = false;
@@ -1062,21 +1104,27 @@ function revisarNotificaciones() {
   const en5Min = new Date(ahora.getTime() + 5 * 60000);
   const horaEn5MinStr = String(en5Min.getHours()).padStart(2, '0') + ':' + String(en5Min.getMinutes()).padStart(2, '0');
 
-  tareas.forEach(function(t) {
-    if (t.estado === 'Completada') return;
+  const tareasDeHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoyStr) && estaTareaActivaEnFecha(t, ahora, hoyStr));
 
-    const esTipoReunion = String(t.tipo || '').toLowerCase().includes('reuni');
-    if (esTipoReunion && t.fechaKey === hoyStr && t.hora === horaEn5MinStr) {
-      if (!notificados5MinMap[t.id]) {
-        notificados5MinMap[t.id] = true;
+  tareasDeHoy.forEach(function(t) {
+    if (!t.hora) return;
+
+    const tipoNormalizado = String(t.tipo || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const esReunion = tipoNormalizado.includes('reunion');
+
+    if (esReunion && t.hora === horaEn5MinStr) {
+      const keyNotif = `${t.id}_5min_${hoyStr}`;
+      if (!notificados5MinMap[keyNotif]) {
+        notificados5MinMap[keyNotif] = true;
         lanzarNotificacion("Clyppy: Reunión en 5 minutos 📅", `${t.tarea} (${t.hora} hs)`);
       }
     }
 
-    if (t.fechaKey === hoyStr && t.hora === horaActualStr) {
-      if (!notificadosMap[t.id]) {
-        notificadosMap[t.id] = true;
-        lanzarNotificacion("Clyppy: ¡Hora de la tarea!", `${t.tarea}`);
+    if (t.hora === horaActualStr) {
+      const keyNotif = `${t.id}_exacta_${hoyStr}`;
+      if (!notificadosMap[keyNotif]) {
+        notificadosMap[keyNotif] = true;
+        lanzarNotificacion("Clyppy: ¡Hora de tu tarea!", `${t.tarea}`);
       }
     }
   });
@@ -1117,9 +1165,10 @@ function obtenerHoyKey() {
 }
 
 function estaTareaCompletaEnFecha(t, fechaKey) {
-  if (t.estado === 'Completada') return true;
-  if (Array.isArray(t.completadasFechas) && t.completadasFechas.includes(fechaKey)) return true;
-  return false;
+  if (t.repeticion && t.repeticion !== 'Una vez') {
+    return Array.isArray(t.completadasFechas) && t.completadasFechas.includes(fechaKey);
+  }
+  return t.estado === 'Completada';
 }
 
 function esDiaHabil(f) {
@@ -1163,12 +1212,18 @@ function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
   const fechaOrigen = new Date(partes[0], partes[1] - 1, partes[2]);
   
   if (t.fechaKey === fechaKey) return true;
-  if (!t.repeticion || t.repeticion === 'Una vez' || fechaCelda < fechaOrigen) return false;
+
+  if (!t.repeticion || t.repeticion === 'Una vez') return false;
+
+  const fCeldaInicio = new Date(fechaCelda.getFullYear(), fechaCelda.getMonth(), fechaCelda.getDate());
+  const fOrigenInicio = new Date(fechaOrigen.getFullYear(), fechaOrigen.getMonth(), fechaOrigen.getDate());
+
+  if (fCeldaInicio < fOrigenInicio) return false;
 
   if (t.repetirHasta) {
     const partesLímite = t.repetirHasta.split('-');
     const fechaLimite = new Date(partesLímite[0], partesLímite[1] - 1, partesLímite[2]);
-    if (fechaCelda > fechaLimite) return false;
+    if (fCeldaInicio > fechaLimite) return false;
   }
 
   const diaSemana = fechaCelda.getDay();
@@ -1196,6 +1251,7 @@ function actualizarUI() {
   actualizarContadores();
   actualizarProgreso();
   if (seccionActual === 'calendario') renderizarCalendario();
+  else if (seccionActual === 'estadisticas') renderizarEstadisticas();
   else if (seccionActual === 'buscar') buscarTareas();
   else if (seccionActual !== 'nueva' && seccionActual !== 'guia') renderizarSegunSeccion();
 
@@ -1249,23 +1305,85 @@ function mostrarSeccion(seccion) {
     document.getElementById('toggleSidebar').textContent = '›';
   }
 
-  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
+  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', estadisticas: 'menuEstadisticas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
   if (mapa[seccion]) document.getElementById(mapa[seccion]).classList.add('activo');
 
   document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
   document.getElementById('formulario').style.display = seccion === 'nueva' ? 'block' : 'none';
   document.getElementById('calendario').style.display = seccion === 'calendario' ? 'block' : 'none';
+  document.getElementById('estadisticasSection').style.display = seccion === 'estadisticas' ? 'block' : 'none';
   document.getElementById('guiaSection').style.display = seccion === 'guia' ? 'block' : 'none';
   document.getElementById('quickAdd').style.display = seccion === 'hoy' ? 'flex' : 'none';
   document.getElementById('progresoContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
+  document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas') ? 'grid' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
+  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
+  else if (seccion === 'estadisticas') renderizarEstadisticas();
   else if (seccion === 'buscar') { buscarTareas(); }
   else if (seccion === 'nueva' || seccion === 'guia') { document.getElementById('lista').innerHTML = ''; }
   else renderizarSegunSeccion();
+}
+
+function renderizarEstadisticas() {
+  const hoy = obtenerHoyKey();
+  let totalHoySeg = 0;
+  let totalSemanaSeg = 0;
+  let totalGeneralSeg = 0;
+
+  let rankingTareas = {};
+
+  const ahora = new Date();
+  const inicioSemana = new Date(ahora);
+  inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+
+  tareas.forEach(t => {
+    const reg = t.registrosTiempo || {};
+    let sumaTarea = 0;
+
+    Object.keys(reg).forEach(f => {
+      const segs = reg[f];
+      sumaTarea += segs;
+      totalGeneralSeg += segs;
+
+      if (f === hoy) totalHoySeg += segs;
+
+      const fObj = new Date(f + 'T00:00:00');
+      if (fObj >= inicioSemana) totalSemanaSeg += segs;
+    });
+
+    if (t.tiempoAcumuladoSec && Object.keys(reg).length === 0) {
+      totalGeneralSeg += t.tiempoAcumuladoSec;
+      sumaTarea += t.tiempoAcumuladoSec;
+    }
+
+    if (sumaTarea > 0) {
+      rankingTareas[t.tarea] = (rankingTareas[t.tarea] || 0) + sumaTarea;
+    }
+  });
+
+  document.getElementById('statTiempoHoy').textContent = formatearSegundos(totalHoySeg);
+  document.getElementById('statTiempoSemana').textContent = formatearSegundos(totalSemanaSeg);
+  document.getElementById('statTiempoTotal').textContent = formatearSegundos(totalGeneralSeg);
+
+  const topOrdenado = Object.keys(rankingTareas)
+    .map(k => ({ nombre: k, segs: rankingTareas[k] }))
+    .sort((a, b) => b.segs - a.segs)
+    .slice(0, 5);
+
+  const contenedorTop = document.getElementById('topTareasLista');
+  if (topOrdenado.length === 0) {
+    contenedorTop.innerHTML = '<div class="topItem">No hay registros de tiempo acumulados.</div>';
+  } else {
+    contenedorTop.innerHTML = topOrdenado.map(item => `
+      <div class="topItem">
+        <span><strong>${escapar(item.nombre)}</strong></span>
+        <span>⏱️ ${formatearSegundos(item.segs)}</span>
+      </div>
+    `).join('');
+  }
 }
 
 function renderizarSegunSeccion() {
@@ -1455,7 +1573,6 @@ function abrirModalEditar(id) {
   }
   document.getElementById('editTiempoAcumulado').textContent = formatearSegundos(totalSegHoy);
 
-  // Renderizar historial de tiempos si existen registros
   const secHistorial = document.getElementById('seccionHistorialTiempo');
   const listaHistorial = document.getElementById('historialLista');
   const regTiempo = t.registrosTiempo || {};
