@@ -133,6 +133,8 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
+.alertaPendientes { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; padding: 12px 16px; border-radius: 12px; margin-bottom: 15px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
 .resumen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
 .card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; cursor: pointer; transition: transform 0.2s; }
 .card:hover { transform: translateY(-2px); }
@@ -162,6 +164,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .tarea.p-alta { border-left-color: var(--p-alta); }
 .tarea.p-media { border-left-color: var(--p-media); }
 .tarea.p-baja { border-left-color: var(--p-baja); }
+.tarea.p-buzon { border-left-color: var(--v3); }
 
 .info { flex: 1; }
 .hora { font-size: 16px; font-weight: 700; color: var(--v2); }
@@ -188,6 +191,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .posponer { background: var(--v5); color: var(--v1); }
 .manana { background: var(--v3); color: white; }
 .volver { background: var(--v2); color: white; }
+.btnProgramar { background: var(--v1); color: white; }
 
 .btnTimer { background: #e8eaf6; color: #283593; border: 1px solid #c5cae9; }
 .btnTimer.activo { background: #2e7d32; color: white; border-color: #1b5e20; }
@@ -329,6 +333,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
+    <button id="menuBuzon" onclick="mostrarSeccion('buzon')">📥 Buzón (Sin fecha)</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
     <button id="menuEstadisticas" onclick="mostrarSeccion('estadisticas')">Estadísticas</button>
     <button id="menuBuscar" onclick="mostrarSeccion('buscar')">Buscar tareas</button>
@@ -355,6 +360,8 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   </header>
 
   <div class="contenedor">
+    <div id="alertaPendientesContainer"></div>
+
     <div id="resumenGrid" class="resumen">
       <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
       <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
@@ -373,6 +380,11 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <button onclick="guardarTareaRapida()">+ Crear</button>
     </div>
 
+    <div id="quickAddBuzon" class="quickAdd" style="display:none;">
+      <input id="inputQuickBuzon" type="text" placeholder="Anotar idea o pendiente sin fecha..." onkeypress="if(event.key==='Enter') guardarIdeaBuzon()">
+      <button onclick="guardarIdeaBuzon()">+ Anotar</button>
+    </div>
+
     <div id="buscador" class="buscador" style="display:none;">
       <input id="inputBuscar" type="text" placeholder="Buscar por nombre, tipo, prioridad o fecha..." oninput="buscarTareas()">
     </div>
@@ -382,7 +394,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <label>¿Qué tenés que hacer?</label>
       <input id="nuevaTarea" type="text" placeholder="Ej: Revisar reporte F043">
       <div class="filaFormulario">
-        <div><label>Fecha</label><input id="nuevaFecha" type="date"></div>
+        <div><label>Fecha (Opcional - Dejar vacío para enviar al Buzón)</label><input id="nuevaFecha" type="date"></div>
         <div><label>Hora</label><input id="nuevaHora" type="time"></div>
       </div>
       <div class="filaFormulario">
@@ -461,6 +473,11 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     <div id="guiaSection" class="guiaContainer" style="display:none;">
       <h2>Guía de uso de Clyppy 📎</h2>
       
+      <div class="guiaItem">
+        <div class="guiaTitulo">📥 Buzón de notas y pendientes</div>
+        <div class="guiaTexto">Si tenés algo que hacer pero aún no sabés cuándo, guardalo en el **Buzón**. Podrás asignarle fecha, hora y prioridad más adelante con el botón **Programar**.</div>
+      </div>
+
       <div class="guiaItem">
         <div class="guiaTitulo">🖥️ Ventana Flotante (Mini App en PC)</div>
         <div class="guiaTexto">Hacé clic en el botón con el ícono de ventana en la barra superior. Se abrirá un panel desplegable que quedará **siempre visible por encima de tus otras aplicaciones** mientras trabajás en Chrome o Edge.</div>
@@ -768,7 +785,7 @@ async function guardarNuevaTarea() {
   const observacion = document.getElementById('nuevaObservacion').value.trim();
   const invitadoEmail = document.getElementById('nuevoInvitado').value.trim().toLowerCase();
 
-  if (!tarea || !fecha) { mostrarToastUI('Escribí una tarea y fecha.'); return; }
+  if (!tarea) { mostrarToastUI('Escribí el nombre de la tarea.'); return; }
 
   mostrarToastUI('Guardando...');
   try {
@@ -779,7 +796,7 @@ async function guardarNuevaTarea() {
       userId: currentUser.uid,
       creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: invitadoEmail,
-      tarea, fechaKey: fecha, hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
+      tarea, fechaKey: fecha || '', hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
@@ -789,8 +806,29 @@ async function guardarNuevaTarea() {
     document.getElementById('nuevaRepetirHasta').value = '';
     document.getElementById('nuevaObservacion').value = '';
     document.getElementById('nuevoInvitado').value = '';
-    mostrarToastUI('Tarea creada.');
-    mostrarSeccion('hoy');
+    mostrarToastUI(fecha ? 'Tarea creada.' : 'Guardada en el Buzón.');
+    mostrarSeccion(fecha ? 'hoy' : 'buzon');
+  } catch (e) { mostrarToastUI('Error al guardar.'); }
+}
+
+async function guardarIdeaBuzon() {
+  const input = document.getElementById('inputQuickBuzon');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  mostrarToastUI('Guardando idea...');
+  try {
+    const { collection, addDoc } = window.fbFunctions;
+    await addDoc(collection(window.fbDb, "tareas"), {
+      userId: currentUser.uid,
+      creadorEmail: (currentUser.email || '').toLowerCase(),
+      invitadoEmail: '',
+      tarea: texto, fechaKey: '', hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
+      observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
+      registrosTiempo: {}, timerInicio: null, timerFechaKey: null
+    });
+    input.value = '';
+    mostrarToastUI('Anotado en el Buzón.');
   } catch (e) { mostrarToastUI('Error al guardar.'); }
 }
 
@@ -844,9 +882,9 @@ async function marcarHecho(id) {
     if (!completadas.includes(hoy)) {
       completadas.push(hoy);
     }
-    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas, timerInicio: null, timerFechaKey: null, registrosTiempo: registros });
+    await updateDoc(doc(window.fbDb, "tareas", id), { completadasFechas: completadas, timerInicio: null, timerFechaKey: null, registrosTiempo: registros, posponerHasta: '' });
   } else {
-    await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada', timerInicio: null, timerFechaKey: null, registrosTiempo: registros });
+    await updateDoc(doc(window.fbDb, "tareas", id), { estado: 'Completada', timerInicio: null, timerFechaKey: null, registrosTiempo: registros, posponerHasta: '' });
   }
   mostrarToastUI('Completada.');
 }
@@ -923,23 +961,32 @@ function actualizarTimersEnVivo() {
 
 async function posponer15(id) {
   const hasta = Date.now() + (15 * 60 * 1000);
+  const hoy = obtenerHoyKey();
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: hasta });
-  mostrarToastUI('+15 minutos.');
+  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: hasta, fechaKey: hoy });
+  mostrarToastUI('+15 minutos (Movida a hoy).');
 }
 
 async function posponer60(id) {
   const hasta = Date.now() + (60 * 60 * 1000);
+  const hoy = obtenerHoyKey();
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: hasta });
-  mostrarToastUI('+1 hora.');
+  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: hasta, fechaKey: hoy });
+  mostrarToastUI('+1 hora (Movida a hoy).');
 }
 
 async function manana(id) {
-  const m = new Date(); m.setDate(m.getDate() + 1); m.setHours(9, 0, 0, 0);
+  const m = new Date(); 
+  m.setDate(m.getDate() + 1); 
+  m.setHours(9, 0, 0, 0);
+  const fechaMananaKey = [
+    m.getFullYear(),
+    String(m.getMonth() + 1).padStart(2, '0'),
+    String(m.getDate()).padStart(2, '0')
+  ].join('-');
   const { doc, updateDoc } = window.fbFunctions;
-  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: m.getTime() });
-  mostrarToastUI('Para mañana.');
+  await updateDoc(doc(window.fbDb, "tareas", id), { posponerHasta: m.getTime(), fechaKey: fechaMananaKey });
+  mostrarToastUI('Movida para mañana.');
 }
 
 function procesarGuardarModal() {
@@ -1001,7 +1048,7 @@ async function guardarEdicionModal(modoRecurrencia) {
   const observacion = document.getElementById('editObservacion').value.trim();
   const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
 
-  if (!tarea || !fecha) { mostrarToastUI('Completá tarea y fecha.'); return; }
+  if (!tarea) { mostrarToastUI('Completá el nombre.'); return; }
   if (invitadoEmail) await guardarContactoSiNuevo(invitadoEmail);
 
   const { doc, updateDoc, collection, addDoc } = window.fbFunctions;
@@ -1250,12 +1297,42 @@ function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
 function actualizarUI() {
   actualizarContadores();
   actualizarProgreso();
+  verificarTareasAtrasadas();
   if (seccionActual === 'calendario') renderizarCalendario();
   else if (seccionActual === 'estadisticas') renderizarEstadisticas();
   else if (seccionActual === 'buscar') buscarTareas();
   else if (seccionActual !== 'nueva' && seccionActual !== 'guia') renderizarSegunSeccion();
 
   if (pipWindow) renderizarPipWidget();
+}
+
+function verificarTareasAtrasadas() {
+  const hoy = obtenerHoyKey();
+  const fechaHoyObj = new Date();
+  const ayerObj = new Date();
+  ayerObj.setDate(ayerObj.getDate() - 1);
+  const ayerKey = [ayerObj.getFullYear(), String(ayerObj.getMonth() + 1).padStart(2, '0'), String(ayerObj.getDate()).padStart(2, '0')].join('-');
+
+  let atrasadas = 0;
+  tareas.forEach(t => {
+    if (t.repeticion && t.repeticion !== 'Una vez') {
+      if (estaTareaActivaEnFecha(t, ayerObj, ayerKey) && !estaTareaCompletaEnFecha(t, ayerKey)) {
+        atrasadas++;
+      }
+    }
+  });
+
+  const alertContainer = document.getElementById('alertaPendientesContainer');
+  if (atrasadas > 0 && seccionActual === 'hoy') {
+    alertContainer.innerHTML = `
+      <div class="alertaPendientes">
+        <span>⚠️ Tenés ${atrasadas} tarea(s) recurrente(s) de ayer sin marcar como hechas.</span>
+        <button onclick="mostrarSeccion('calendario')" style="background: #e65100; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Ver calendario</button>
+      </div>
+    `;
+  } else {
+    alertContainer.innerHTML = '';
+  }
 }
 
 function actualizarContadores() {
@@ -1305,7 +1382,7 @@ function mostrarSeccion(seccion) {
     document.getElementById('toggleSidebar').textContent = '›';
   }
 
-  const mapa = { hoy: 'menuHoy', calendario: 'menuCalendario', estadisticas: 'menuEstadisticas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
+  const mapa = { hoy: 'menuHoy', buzon: 'menuBuzon', calendario: 'menuCalendario', estadisticas: 'menuEstadisticas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
   if (mapa[seccion]) document.getElementById(mapa[seccion]).classList.add('activo');
 
   document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
@@ -1314,10 +1391,12 @@ function mostrarSeccion(seccion) {
   document.getElementById('estadisticasSection').style.display = seccion === 'estadisticas' ? 'block' : 'none';
   document.getElementById('guiaSection').style.display = seccion === 'guia' ? 'block' : 'none';
   document.getElementById('quickAdd').style.display = seccion === 'hoy' ? 'flex' : 'none';
+  document.getElementById('quickAddBuzon').style.display = seccion === 'buzon' ? 'flex' : 'none';
   document.getElementById('progresoContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
   document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas') ? 'grid' : 'none';
+  document.getElementById('alertaPendientesContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
+  const titulos = { hoy: 'Mis tareas', buzon: 'Buzón (Sin fecha asignada)', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
@@ -1393,11 +1472,15 @@ function renderizarSegunSeccion() {
 
   if (seccionActual === 'hoy') {
     lista = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
+    lista.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
+  } else if (seccionActual === 'buzon') {
+    lista = tareas.filter(t => (!t.fechaKey || t.fechaKey === '') && t.estado !== 'Completada');
+    lista.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   } else if (seccionActual === 'completadas') {
     lista = tareas.filter(t => t.estado === 'Completada' || (Array.isArray(t.completadasFechas) && t.completadasFechas.length > 0));
+    lista.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
   }
 
-  lista.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
   renderizar(lista);
 }
 
@@ -1405,6 +1488,7 @@ function renderizar(lista) {
   const contenedor = document.getElementById('lista');
   if (!lista || lista.length === 0) {
     let mensaje = 'No tenés tareas pendientes.';
+    if (seccionActual === 'buzon') mensaje = 'El buzón está vacío. ¡Anotá tus ideas rápido!';
     if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
     if (seccionActual === 'buscar') mensaje = 'Ingresá un término o no se encontraron tareas.';
     contenedor.innerHTML = `<div class="card">${mensaje}</div>`;
@@ -1424,10 +1508,11 @@ function crearTarjeta(tarea) {
   const esInvitado = tarea.invitadoEmail && tarea.invitadoEmail === userEmailNorm;
   const esCreadorConInvitado = tarea.invitadoEmail && tarea.creadorEmail === userEmailNorm;
   
-  const prioClase = 'p-' + String(tarea.prioridad || 'media').toLowerCase();
+  const prioClase = (!tarea.fechaKey || tarea.fechaKey === '') ? 'p-buzon' : ('p-' + String(tarea.prioridad || 'media').toLowerCase());
   const tipoClase = 'dot-' + String(tarea.tipo || 'personal').toLowerCase().replace(/\s+/g, '');
 
   const esModoBuscar = seccionActual === 'buscar';
+  const esModoBuzon = seccionActual === 'buzon' || (!tarea.fechaKey || tarea.fechaKey === '');
 
   const estaCorriendo = Boolean(tarea.timerInicio);
   let segAcumulados = obtenerSegundosDeFecha(tarea, hoy);
@@ -1440,7 +1525,7 @@ function crearTarjeta(tarea) {
     <div class="tarea ${prioClase}" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">
       <div class="info">
         <div class="hora">
-          ${escapar(tarea.hora || 'Sin horario')}
+          ${esModoBuzon ? '📥 Nota / Sin fecha' : escapar(tarea.hora || 'Sin horario')}
           ${tieneTiempo ? `<span class="badgeTiempo ${estaCorriendo ? 'corriendo' : ''}" id="timer-display-${tarea.id}">⏱️ ${formatearSegundos(segAcumulados)}</span>` : ''}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
           ${esInvitado ? `<span class="tagInvitado">Compartida por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
@@ -1452,12 +1537,17 @@ function crearTarjeta(tarea) {
           ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
         </div>
         ${tarea.observacion ? `<div class="observacion">📝 <strong>Observaciones:</strong> ${escapar(tarea.observacion)}</div>` : ''}
+        ${tarea.fechaKey ? `
         <div>
-          <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey || '')}</span>
-        </div>
+          <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey)}</span>
+        </div>` : ''}
       </div>
       <div class="acciones" onclick="event.stopPropagation()">
-        ${!estaHechaHoy ? `
+        ${esModoBuzon ? `
+          <button class="btnProgramar" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">📅 Programar dia/hora</button>
+          <button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>
+        ` : ''}
+        ${!esModoBuzon && !estaHechaHoy ? `
           <button class="btnTimer ${estaCorriendo ? 'activo' : ''}" onclick="toggleTimerTarea('${escaparJS(tarea.id)}')">
             ${estaCorriendo ? '⏸ Pausar' : '▶ Iniciar'}
           </button>
@@ -1559,7 +1649,7 @@ function abrirModalEditar(id) {
   const hoy = obtenerHoyKey();
   document.getElementById('editId').value = t.id;
   document.getElementById('editTarea').value = t.tarea;
-  document.getElementById('editFecha').value = t.fechaKey;
+  document.getElementById('editFecha').value = t.fechaKey || '';
   document.getElementById('editHora').value = t.hora || '';
   document.getElementById('editTipo').value = t.tipo || 'Personal';
   document.getElementById('editPrioridad').value = t.prioridad || 'Media';
