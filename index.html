@@ -333,7 +333,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
-    <button id="menuBuzon" onclick="mostrarSeccion('buzon')">📥 Buzón (Sin fecha)</button>
+    <button id="menuBuzon" onclick="mostrarSeccion('buzon')">Buzón</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
     <button id="menuEstadisticas" onclick="mostrarSeccion('estadisticas')">Estadísticas</button>
     <button id="menuBuscar" onclick="mostrarSeccion('buscar')">Buscar tareas</button>
@@ -474,7 +474,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       <h2>Guía de uso de Clyppy 📎</h2>
       
       <div class="guiaItem">
-        <div class="guiaTitulo">📥 Buzón de notas y pendientes</div>
+        <div class="guiaTitulo">Buzón de notas y pendientes</div>
         <div class="guiaTexto">Si tenés algo que hacer pero aún no sabés cuándo, guardalo en el **Buzón**. Podrás asignarle fecha, hora y prioridad más adelante con el botón **Programar**.</div>
       </div>
 
@@ -1396,7 +1396,7 @@ function mostrarSeccion(seccion) {
   document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas') ? 'grid' : 'none';
   document.getElementById('alertaPendientesContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', buzon: 'Buzón (Sin fecha asignada)', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
+  const titulos = { hoy: 'Mis tareas', buzon: 'Buzón', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
@@ -1525,7 +1525,7 @@ function crearTarjeta(tarea) {
     <div class="tarea ${prioClase}" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">
       <div class="info">
         <div class="hora">
-          ${esModoBuzon ? '📥 Nota / Sin fecha' : escapar(tarea.hora || 'Sin horario')}
+          ${esModoBuzon ? 'Nota / Sin fecha' : escapar(tarea.hora || 'Sin horario')}
           ${tieneTiempo ? `<span class="badgeTiempo ${estaCorriendo ? 'corriendo' : ''}" id="timer-display-${tarea.id}">⏱️ ${formatearSegundos(segAcumulados)}</span>` : ''}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
           ${esInvitado ? `<span class="tagInvitado">Compartida por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
