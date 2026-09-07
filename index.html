@@ -82,11 +82,24 @@
 
   --fondo: #f7f5fa;
   --blanco: #ffffff;
+  --card-bg: #ffffff;
+  --texto-principal: #231942;
+  --texto-secundario: #5E548E;
+  --borde-color: #E0B1CB;
+}
+
+body.dark-mode {
+  --fondo: #120c24;
+  --blanco: #1d1536;
+  --card-bg: #1d1536;
+  --texto-principal: #f7f5fa;
+  --texto-secundario: #E0B1CB;
+  --borde-color: #5E548E;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; min-height: 100%; }
-body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--fondo); color: var(--v1); }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--fondo); color: var(--texto-principal); transition: background 0.3s, color 0.3s; }
 
 .loginOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--v1); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; text-align: center; color: white; }
 .loginCard { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px 25px; max-width: 400px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
@@ -94,7 +107,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .btnLogin { background: white; color: #333; border: none; border-radius: 12px; padding: 14px 20px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; margin-top: 25px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
 .btnLogin:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
-.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 245px; background: var(--v1); color: white; padding: 24px 14px; z-index: 100; transition: transform .25s ease; }
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 245px; background: var(--v1); color: white; padding: 24px 14px; z-index: 100; transition: transform .25s ease; display: flex; flex-direction: column; }
 .sidebar.oculta { transform: translateX(-245px); }
 
 .logo { display: flex; align-items: center; gap: 12px; padding: 5px 12px 28px; font-size: 25px; font-weight: 700; letter-spacing: -0.5px; }
@@ -107,9 +120,14 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .userName { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .btnLogout { background: none; border: none; color: var(--v5); font-size: 12px; cursor: pointer; padding: 0; text-align: left; text-decoration: underline; }
 
-.menu { display: flex; flex-direction: column; gap: 6px; }
-.menu button { width: 100%; border: none; background: transparent; color: #eee; padding: 14px 15px; border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; text-align: left; }
+.menu { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.menu button { width: 100%; border: none; background: transparent; color: #eee; padding: 12px 15px; border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; text-align: left; }
 .menu button:hover, .menu button.activo { background: var(--v2); }
+
+.sidebarFooter { display: flex; justify-content: space-around; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.15); margin-top: auto; }
+.btnIconoSidebar { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-size: 18px; cursor: pointer; padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--v5); transition: background .2s, color .2s; }
+.btnIconoSidebar:hover { background: var(--v2); color: white; }
+.btnIconoSidebar svg { width: 18px; height: 18px; fill: currentColor; }
 
 .toggleSidebar { position: fixed; left: 226px; top: 18px; width: 40px; height: 40px; border: none; border-radius: 50%; background: var(--v2); color: white; cursor: pointer; z-index: 200; font-size: 20px; transition: left .25s ease; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
 .sidebar.oculta ~ .toggleSidebar { left: 12px; }
@@ -117,66 +135,59 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .main { margin-left: 245px; min-height: 100vh; transition: margin-left .25s ease; padding-bottom: 30px; }
 .main.expandido { margin-left: 0; }
 
-.header { background: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--v5); }
+.header { background: var(--card-bg); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--borde-color); }
 .headerIzda { display: flex; align-items: center; gap: 10px; margin-left: 35px; }
 .tituloHeader { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
-.fecha { color: var(--v2); font-size: 13px; font-weight: 500; }
-
-.btnIconoHeader { background: #f0ebf8; border: 1px solid var(--v5); font-size: 18px; cursor: pointer; padding: 8px 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--v1); transition: background .2s; }
-.btnIconoHeader:hover { background: var(--v5); }
-.btnIconoHeader svg { width: 18px; height: 18px; fill: currentColor; }
-
-#btnPip { display: none; }
-@media(min-width: 769px) {
-  #btnPip { display: flex; }
-}
+.fecha { color: var(--texto-secundario); font-size: 13px; font-weight: 500; }
 
 .contenedor { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
-.alertaPendientes { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; padding: 12px 16px; border-radius: 12px; margin-bottom: 15px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.alertaPendientes { background: rgba(230, 81, 0, 0.1); border: 1px solid #ffe0b2; color: #e65100; padding: 12px 16px; border-radius: 12px; margin-bottom: 15px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 
-.resumen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
-.card { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; cursor: pointer; transition: transform 0.2s; }
+.resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+.card { background: var(--card-bg); border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); text-align: center; cursor: pointer; transition: transform 0.2s; border: 1px solid var(--borde-color); }
 .card:hover { transform: translateY(-2px); }
-.numero { font-size: 26px; font-weight: 700; color: var(--v1); }
-.titulo { color: var(--v2); margin-top: 4px; font-size: 13px; font-weight: 500; }
+.numero { font-size: 24px; font-weight: 700; color: var(--texto-principal); }
+.titulo { color: var(--texto-secundario); margin-top: 4px; font-size: 12px; font-weight: 500; }
 
-.progresoContainer { background: white; border-radius: 14px; padding: 14px 18px; margin-bottom: 15px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
-.progresoInfo { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--v2); }
-.barFondo { background: #f0ebf8; height: 10px; border-radius: 6px; overflow: hidden; }
+.progresoContainer { background: var(--card-bg); border-radius: 14px; padding: 14px 18px; margin-bottom: 15px; box-shadow: 0 3px 12px rgba(35,25,66,.08); border: 1px solid var(--borde-color); }
+.progresoInfo { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--texto-secundario); }
+.barFondo { background: rgba(160, 134, 192, 0.2); height: 10px; border-radius: 6px; overflow: hidden; }
 .barFill { background: linear-gradient(90deg, var(--v3), var(--v1)); height: 100%; width: 0%; transition: width 0.4s ease; }
 
 .quickAdd { display: flex; gap: 8px; margin-bottom: 20px; }
-.quickAdd input { flex: 1; padding: 12px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 15px; outline: none; font-family: 'Inter', sans-serif; background: white; color: var(--v1); }
+.quickAdd input { flex: 1; padding: 12px 16px; border: 2px solid var(--borde-color); border-radius: 12px; font-size: 15px; outline: none; font-family: 'Inter', sans-serif; background: var(--card-bg); color: var(--texto-principal); }
 .quickAdd button { background: var(--v1); color: white; border: none; border-radius: 12px; padding: 0 20px; font-weight: 600; cursor: pointer; }
 
-.buscador { margin-bottom: 20px; }
-.buscador input { width: 100%; padding: 14px 16px; border: 2px solid var(--v5); border-radius: 12px; font-size: 16px; outline: none; font-family: 'Inter', sans-serif; }
+.buscador { margin-bottom: 20px; background: var(--card-bg); padding: 16px; border-radius: 14px; border: 1px solid var(--borde-color); }
+.buscador input { width: 100%; padding: 12px 16px; border: 2px solid var(--borde-color); border-radius: 12px; font-size: 15px; outline: none; font-family: 'Inter', sans-serif; background: var(--card-bg); color: var(--texto-principal); }
 
-.formulario { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.formulario { background: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); border: 1px solid var(--borde-color); }
 .formulario h2 { margin-top: 0; font-size: 20px; font-weight: 700; }
 .formulario label { display: block; margin-top: 14px; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
-.formulario input, .formulario select, .formulario textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; font-family: 'Inter', sans-serif; }
+.formulario input, .formulario select, .formulario textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 10px; font-size: 15px; font-family: 'Inter', sans-serif; background: var(--card-bg); color: var(--texto-principal); }
 .filaFormulario { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .btnGuardar { width: 100%; margin-top: 20px; background: var(--v1); color: white; border: none; border-radius: 10px; padding: 14px; cursor: pointer; font-weight: 600; font-size: 16px; }
 
-.tarea { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(35,25,66,.08); display: flex; flex-direction: column; gap: 12px; border-left: 6px solid var(--v4); cursor: pointer; }
+.tarea { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(35,25,66,.08); display: flex; flex-direction: column; gap: 12px; border-left: 6px solid var(--v4); cursor: pointer; border-top: 1px solid var(--borde-color); border-right: 1px solid var(--borde-color); border-bottom: 1px solid var(--borde-color); }
 .tarea.p-alta { border-left-color: var(--p-alta); }
 .tarea.p-media { border-left-color: var(--p-media); }
 .tarea.p-baja { border-left-color: var(--p-baja); }
 .tarea.p-buzon { border-left-color: var(--v3); }
 
 .info { flex: 1; }
-.hora { font-size: 16px; font-weight: 700; color: var(--v2); }
-.nombre { font-size: 17px; font-weight: 600; margin: 4px 0; }
+.hora { font-size: 15px; font-weight: 700; color: var(--texto-secundario); }
+.nombre { font-size: 16px; font-weight: 600; margin: 4px 0; }
 .dotTipo { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
 .dot-trabajo { background: var(--t-trabajo); }
 .dot-personal { background: var(--t-personal); }
 .dot-f043 { background: var(--t-f043); }
 .dot-reunion { background: var(--t-reunion); }
 .dot-seguimiento { background: var(--t-seguimiento); }
-.detalle { color: var(--v2); font-size: 13px; }
-.observacion { color: var(--v1); font-size: 13px; margin-top: 6px; background: #f7f5fa; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); word-break: break-word; }
+.detalle { color: var(--texto-secundario); font-size: 13px; }
+.observacion { color: var(--texto-principal); font-size: 13px; margin-top: 6px; background: var(--fondo); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--v3); word-break: break-word; }
+
+.badgeTag { display: inline-block; background: rgba(159, 134, 192, 0.2); color: var(--v2); font-weight: 600; padding: 2px 8px; border-radius: 6px; font-size: 11px; margin-left: 6px; }
 
 .badgeTiempo { display: inline-flex; align-items: center; gap: 4px; background: #e0f2f1; color: #004d40; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 12px; margin-left: 8px; }
 .badgeTiempo.corriendo { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; animation: pulseGlow 1.5s infinite; }
@@ -190,37 +201,36 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 .hecho { background: var(--v2); color: white; }
 .posponer { background: var(--v5); color: var(--v1); }
 .manana { background: var(--v3); color: white; }
-.volver { background: var(--v2); color: white; }
 .btnProgramar { background: var(--v1); color: white; }
 
 .btnTimer { background: #e8eaf6; color: #283593; border: 1px solid #c5cae9; }
 .btnTimer.activo { background: #2e7d32; color: white; border-color: #1b5e20; }
 
 .btnEditarAccion { 
-  background: #f0ebf8; 
-  color: var(--v1); 
-  border: 1px solid var(--v5); 
+  background: var(--fondo); 
+  color: var(--texto-principal); 
+  border: 1px solid var(--borde-color); 
   border-radius: 8px; 
   padding: 10px; 
   cursor: pointer; 
   transition: background 0.2s;
 }
 .btnEditarAccion:hover { background: var(--v5); }
-.btnEditarAccion svg { width: 15px; height: 15px; fill: var(--v1); }
+.btnEditarAccion svg { width: 15px; height: 15px; fill: currentColor; }
 
-.calendario { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.calendario { background: var(--card-bg); border-radius: 14px; padding: 16px; box-shadow: 0 3px 12px rgba(35,25,66,.08); border: 1px solid var(--borde-color); }
 .calHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .calHeader h2 { margin: 0; font-size: 18px; font-weight: 700; }
 .calNav { display: flex; gap: 6px; }
 .calNav button { border: none; background: var(--v2); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 13px; font-weight: 500; }
 
 .calGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.calDiaSemana { text-align: center; font-size: 12px; font-weight: 700; color: var(--v2); padding: 4px 0; }
-.calCelda { min-height: 75px; border: 1px solid #eee; border-radius: 8px; padding: 3px; background: #fff; min-width: 0; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: background 0.2s; }
-.calCelda:hover { background: #fdfbff; }
+.calDiaSemana { text-align: center; font-size: 12px; font-weight: 700; color: var(--texto-secundario); padding: 4px 0; }
+.calCelda { min-height: 75px; border: 1px solid var(--borde-color); border-radius: 8px; padding: 3px; background: var(--card-bg); min-width: 0; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: background 0.2s; }
+.calCelda:hover { background: rgba(159, 134, 192, 0.1); border-color: var(--v3); }
 .calCelda.otroMes { opacity: .35; }
-.calCelda.hoy { border: 2px solid var(--v3); background: #faf8fd; }
-.calNumero { font-size: 11px; font-weight: 700; margin-bottom: 2px; color: var(--v1); }
+.calCelda.hoy { border: 2px solid var(--v3); background: rgba(190, 149, 196, 0.15); }
+.calNumero { font-size: 11px; font-weight: 700; margin-bottom: 2px; color: var(--texto-principal); }
 
 .calTarea { 
   display: block; 
@@ -237,53 +247,43 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   color: var(--v1);
 }
 
-.calTarea.tipo-trabajo { background: var(--bg-trabajo); color: #2c2250; }
-.calTarea.tipo-personal { background: var(--bg-personal); color: #4a148c; }
-.calTarea.tipo-f043 { background: var(--bg-f043); color: #880e4f; }
-.calTarea.tipo-reunion, .calTarea.tipo-reunión { background: var(--bg-reunion); color: #01579b; }
-.calTarea.tipo-seguimiento { background: var(--bg-seguimiento); color: #004d40; }
-
-.calTarea.p-alta { border-left-color: var(--p-alta); }
-.calTarea.p-media { border-left-color: var(--p-media); }
-.calTarea.p-baja { border-left-color: var(--p-baja); }
-
 .calTarea.completada { text-decoration: line-through; opacity: .5; }
 
 /* SECCIÓN ESTADÍSTICAS */
-.statsContainer { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
+.statsContainer { background: var(--card-bg); border-radius: 14px; padding: 20px; box-shadow: 0 3px 12px rgba(35,25,66,.08); border: 1px solid var(--borde-color); }
 .statsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-.statBox { background: #f7f5fa; border-radius: 12px; padding: 16px; border: 1px solid var(--v5); text-align: center; }
-.statNum { font-size: 24px; font-weight: 700; color: var(--v1); }
-.statLabel { font-size: 12px; color: var(--v2); font-weight: 600; margin-top: 4px; }
-.topLista { background: #fff; border-radius: 10px; padding: 10px; border: 1px solid #eee; }
-.topItem { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0ebf8; font-size: 13px; }
+.statBox { background: var(--fondo); border-radius: 12px; padding: 16px; border: 1px solid var(--borde-color); text-align: center; }
+.statNum { font-size: 24px; font-weight: 700; color: var(--texto-principal); }
+.statLabel { font-size: 12px; color: var(--texto-secundario); font-weight: 600; margin-top: 4px; }
+.topLista { background: var(--card-bg); border-radius: 10px; padding: 10px; border: 1px solid var(--borde-color); }
+.topItem { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--borde-color); font-size: 13px; }
 .topItem:last-child { border-bottom: none; }
 
-.guiaContainer { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 3px 12px rgba(35,25,66,.08); }
-.guiaContainer h2 { margin-top: 0; color: var(--v1); font-size: 22px; }
-.guiaItem { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+.guiaContainer { background: var(--card-bg); border-radius: 14px; padding: 24px; box-shadow: 0 3px 12px rgba(35,25,66,.08); border: 1px solid var(--borde-color); }
+.guiaContainer h2 { margin-top: 0; color: var(--texto-principal); font-size: 22px; }
+.guiaItem { margin-bottom: 20px; border-bottom: 1px solid var(--borde-color); padding-bottom: 16px; }
 .guiaItem:last-child { border-bottom: none; }
-.guiaTitulo { font-weight: 700; font-size: 16px; color: var(--v2); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.guiaTexto { font-size: 14px; color: #444; line-height: 1.5; }
+.guiaTitulo { font-weight: 700; font-size: 16px; color: var(--texto-secundario); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.guiaTexto { font-size: 14px; color: var(--texto-principal); line-height: 1.5; }
 
 .modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(35, 25, 66, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; padding: 15px; }
 .modalOverlay.activo { opacity: 1; pointer-events: auto; }
-.modal { background: white; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modal { background: var(--card-bg); color: var(--texto-principal); border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid var(--borde-color); }
 .modalHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .modalHeader h3 { margin: 0; font-weight: 700; }
-.btnCloseModal { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--v2); }
+.btnCloseModal { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--texto-secundario); }
 .modalBody { overflow-y: auto; padding-right: 4px; flex: 1; -webkit-overflow-scrolling: touch; }
 .modalBody label { display: block; margin-top: 10px; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
-.modalBody input, .modalBody select, .modalBody textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
-.modalFooter { margin-top: 15px; display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+.modalBody input, .modalBody select, .modalBody textarea { width: 100%; padding: 12px; border: 1px solid var(--v4); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; background: var(--card-bg); color: var(--texto-principal); }
+.modalFooter { margin-top: 15px; display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid var(--borde-color); }
 .btnEliminar { background: #e63946; color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
 .btnGuardarModal { background: var(--v1); color: white; border: none; border-radius: 8px; padding: 12px 16px; cursor: pointer; font-weight: 600; }
 
 .toast { position: fixed; left: 20px; right: 20px; bottom: 20px; background: var(--v1); color: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 1500; font-size: 14px; }
 .toast.visible { opacity: 1; transform: translateY(0); }
 
-.historialLista { background: #f7f5fa; border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 12px; max-height: 120px; overflow-y: auto; border: 1px solid var(--v4); }
-.historialFila { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; }
+.historialLista { background: var(--fondo); border-radius: 8px; padding: 10px; margin-top: 6px; font-size: 12px; max-height: 120px; overflow-y: auto; border: 1px solid var(--v4); }
+.historialFila { display: flex; justify-content: space-between; border-bottom: 1px solid var(--borde-color); padding: 4px 0; }
 .historialFila:last-child { border-bottom: none; }
 
 @media(max-width: 768px) {
@@ -292,10 +292,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   .main { margin-left: 0 !important; }
   .toggleSidebar { left: 12px !important; }
   .sidebar.visibleMobile ~ .toggleSidebar { left: 226px !important; }
-  .resumen { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .card { padding: 12px 6px; }
-  .numero { font-size: 22px; }
-  .titulo { font-size: 11px; }
+  .resumen { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .card { padding: 10px 4px; }
+  .numero { font-size: 20px; }
+  .titulo { font-size: 10px; }
   .filaFormulario { grid-template-columns: 1fr; gap: 0; }
 
   .calendario { padding: 10px 4px; }
@@ -333,6 +333,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
+    <button id="menuAtrasadas" onclick="mostrarSeccion('atrasadas')">Atrasadas / Por revisar</button>
     <button id="menuBuzon" onclick="mostrarSeccion('buzon')">Buzón</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
     <button id="menuEstadisticas" onclick="mostrarSeccion('estadisticas')">Estadísticas</button>
@@ -340,6 +341,18 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     <button id="menuNueva" onclick="mostrarSeccion('nueva')">Nueva tarea</button>
     <button id="menuCompletadas" onclick="mostrarSeccion('completadas')">Completadas</button>
     <button id="menuGuia" onclick="mostrarSeccion('guia')">Cómo usar</button>
+  </div>
+
+  <div class="sidebarFooter">
+    <button id="btnNotif" class="btnIconoSidebar" onclick="toggleNotificaciones()" title="Notificaciones">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+    </button>
+    <button id="btnPip" class="btnIconoSidebar" onclick="togglePipWidget()" title="Ventana flotante (PC)">
+      <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/></svg>
+    </button>
+    <button id="btnDarkMode" class="btnIconoSidebar" onclick="toggleDarkMode()" title="Modo oscuro">
+      <svg viewBox="0 0 24 24"><path d="M12.3 2a10 10 0 0 0 9.7 11.5 10 10 0 1 1-11.5-9.7z"/></svg>
+    </button>
   </div>
 </aside>
 
@@ -349,12 +362,6 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   <header class="header">
     <div class="headerIzda">
       <div class="tituloHeader" id="tituloHeader">Mis tareas</div>
-      <button id="btnNotif" class="btnIconoHeader" onclick="toggleNotificaciones()" title="Notificaciones">
-        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-      </button>
-      <button id="btnPip" class="btnIconoHeader" onclick="togglePipWidget()" title="Ventana flotante (PC)">
-        <svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 0H3V5h18v14z"/></svg>
-      </button>
     </div>
     <div class="fecha" id="fecha"></div>
   </header>
@@ -364,6 +371,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
     <div id="resumenGrid" class="resumen">
       <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
+      <div class="card" onclick="mostrarSeccion('atrasadas')"><div class="numero" id="numAtrasadas">0</div><div class="titulo">Atrasadas</div></div>
       <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
     </div>
 
@@ -386,7 +394,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     </div>
 
     <div id="buscador" class="buscador" style="display:none;">
-      <input id="inputBuscar" type="text" placeholder="Buscar por nombre, tipo, prioridad o fecha..." oninput="buscarTareas()">
+      <input id="inputBuscar" type="text" placeholder="Buscar por nombre, tag, tipo, prioridad o fecha..." oninput="buscarTareas()">
     </div>
 
     <div id="formulario" class="formulario" style="display:none;">
@@ -413,6 +421,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       </div>
       <div class="filaFormulario">
         <div>
+          <label>Etiqueta / Tag (Opcional)</label>
+          <input id="nuevoTag" type="text" placeholder="Ej: Proyecto X, Finanzas, Urgente">
+        </div>
+        <div>
           <label>Repetición</label>
           <select id="nuevaRepeticion" onchange="toggleRepetirHasta()">
             <option>Una vez</option>
@@ -423,10 +435,10 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
             <option>Mensual (Antepenúltimo día hábil)</option>
           </select>
         </div>
-        <div id="colRepetirHasta" style="display:none;">
-          <label>Repetir hasta (opcional)</label>
-          <input id="nuevaRepetirHasta" type="date">
-        </div>
+      </div>
+      <div id="colRepetirHasta" style="display:none; margin-top: 10px;">
+        <label>Repetir hasta (opcional)</label>
+        <input id="nuevaRepetirHasta" type="date">
       </div>
       <label>Observaciones (opcional)</label>
       <textarea id="nuevaObservacion" rows="2" placeholder="Agregar detalles u observaciones..."></textarea>
@@ -464,7 +476,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         </div>
       </div>
 
-      <h3 style="margin-top:20px; font-size:16px;">🔥 Top Tareas que más tiempo consumen:</h3>
+      <h3 style="margin-top:20px; font-size:16px;">Top Tareas que más tiempo consumen:</h3>
       <div class="topLista" id="topTareasLista">
         <div class="topItem">No hay suficientes datos de tiempo registrados aún.</div>
       </div>
@@ -479,23 +491,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       </div>
 
       <div class="guiaItem">
-        <div class="guiaTitulo">🖥️ Ventana Flotante (Mini App en PC)</div>
-        <div class="guiaTexto">Hacé clic en el botón con el ícono de ventana en la barra superior. Se abrirá un panel desplegable que quedará **siempre visible por encima de tus otras aplicaciones** mientras trabajás en Chrome o Edge.</div>
+        <div class="guiaTitulo">Atrasadas / Por revisar</div>
+        <div class="guiaTexto">Las tareas de días anteriores que no marcaste como completadas quedarán en esta sección para que no las olvides ni se te pierdan.</div>
       </div>
 
       <div class="guiaItem">
-        <div class="guiaTitulo">🤝 Tareas Compartidas y Colaborativas</div>
-        <div class="guiaTexto">Podés agregar el correo Gmail de un compañero al crear o editar una tarea. Tanto vos como tu invitado podrán modificar detalles y agregar observaciones en tiempo real.</div>
-      </div>
-
-      <div class="guiaItem">
-        <div class="guiaTitulo">🔔 Notificaciones Inteligentes</div>
-        <div class="guiaTexto">Recibirás alertas del navegador **5 minutos antes** de tus tareas tipo **Reunión**, además de notificaciones a la hora exacta para todas las tareas activas de hoy.</div>
-      </div>
-
-      <div class="guiaItem">
-        <div class="guiaTitulo">⏱️ Cronómetro e Historial de Tiempo por Día</div>
-        <div class="guiaTexto">Iniciá y pausá el medidor con **▶ Iniciar**. En las tareas recurrentes, el tiempo se guarda **independiente para cada día** para que puedas analizar tu rendimiento diario en la pestaña Estadísticas.</div>
+        <div class="guiaTitulo">Ventana Flotante (Mini App en PC)</div>
+        <div class="guiaTexto">Hacé clic en el ícono de la ventana en la parte inferior del menú lateral para tener tus tareas **siempre visibles** por encima de otras ventanas en Chrome o Edge.</div>
       </div>
     </div>
 
@@ -511,7 +513,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     </div>
     <div class="modalBody">
       <input type="hidden" id="editId">
-      <label>Tarea</label><input id="editTarea" type="text" onblur="window.scrollTo(0, 0)">
+      <label>Tarea</label><input id="editTarea" type="text">
       <div class="filaFormulario">
         <div><label>Fecha</label><input id="editFecha" type="date"></div>
         <div><label>Hora</label><input id="editHora" type="time"></div>
@@ -530,6 +532,8 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
           </select>
         </div>
       </div>
+      <label>Etiqueta / Tag</label>
+      <input id="editTag" type="text" placeholder="Ej: Proyecto X, Finanzas">
       <label>Repetición</label>
       <select id="editRepeticion">
         <option>Una vez</option>
@@ -539,18 +543,18 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
         <option>Semanal</option>
         <option>Mensual (Antepenúltimo día hábil)</option>
       </select>
-      <label>Observaciones (Podés editar o agregar notas)</label>
-      <textarea id="editObservacion" rows="3" placeholder="Agregar detalles u observaciones..." onblur="window.scrollTo(0, 0)"></textarea>
+      <label>Observaciones</label>
+      <textarea id="editObservacion" rows="3" placeholder="Agregar detalles u observaciones..."></textarea>
       <label>Compartir con amigo (Gmail)</label>
-      <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados" onblur="window.scrollTo(0, 0)">
+      <input id="editInvitado" type="email" placeholder="amigo@gmail.com" list="listaInvitadosGuardados">
       
-      <div style="margin-top: 15px; padding: 10px; background: #f0ebf8; border-radius: 8px; font-size: 13px; color: var(--v1); display: flex; justify-content: space-between; align-items: center;">
+      <div style="margin-top: 15px; padding: 10px; background: var(--fondo); border-radius: 8px; font-size: 13px; color: var(--texto-principal); display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--borde-color);">
         <span>⏱️ Tiempo de hoy: <strong id="editTiempoAcumulado">0m 0s</strong></span>
         <button onclick="resetearTiempoModal()" style="background: var(--v5); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-weight: 600;">Resetear hoy</button>
       </div>
 
       <div id="seccionHistorialTiempo" style="margin-top: 10px; display:none;">
-        <label>📊 Historial de tiempo por fecha:</label>
+        <label>Historial de tiempo por fecha:</label>
         <div class="historialLista" id="historialLista"></div>
       </div>
     </div>
@@ -564,11 +568,26 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
   </div>
 </div>
 
+<div id="modalVerDia" class="modalOverlay">
+  <div class="modal">
+    <div class="modalHeader">
+      <h3 id="tituloModalVerDia">Tareas del día</h3>
+      <button class="btnCloseModal" onclick="cerrarModalVerDia()">✕</button>
+    </div>
+    <div class="modalBody">
+      <div id="listaTareasDiaModal"></div>
+    </div>
+    <div class="modalFooter" style="justify-content: flex-end;">
+      <button class="btnGuardarModal" id="btnAgregarTareaAEsteDia">+ Agregar tarea a este día</button>
+    </div>
+  </div>
+</div>
+
 <div id="modalRecurrente" class="modalOverlay">
   <div class="modal" style="max-width: 400px;">
     <div class="modalHeader"><h3 id="tituloModalRecurrente">Tarea recurrente</h3></div>
     <div class="modalBody">
-      <p style="margin: 5px 0 15px; color: var(--v2); font-size: 14px;" id="descModalRecurrente">Esta tarea se repite. ¿Cómo querés aplicar el cambio?</p>
+      <p style="margin: 5px 0 15px; color: var(--texto-secundario); font-size: 14px;" id="descModalRecurrente">Esta tarea se repite. ¿Cómo querés aplicar el cambio?</p>
     </div>
     <div class="modalFooter" style="flex-direction: column; gap: 8px;">
       <button class="btnGuardarModal" style="width: 100%;" onclick="ejecutarAccionRecurrente('solo_esta')">Aplicar solo a esta fecha</button>
@@ -581,7 +600,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 <div id="modalConfirmar" class="modalOverlay">
   <div class="modal" style="max-width: 380px;">
     <div class="modalHeader"><h3>¿Eliminar tarea?</h3></div>
-    <div class="modalBody"><p style="margin: 5px 0; color: var(--v2);">Esta acción no se puede deshacer.</p></div>
+    <div class="modalBody"><p style="margin: 5px 0; color: var(--texto-secundario);">Esta acción no se puede deshacer.</p></div>
     <div class="modalFooter" style="justify-content: flex-end; gap: 10px;">
       <button class="btnEditarAccion" onclick="cerrarModalConfirmar()">Cancelar</button>
       <button class="btnEliminar" onclick="procesarEliminarModal()">Eliminar</button>
@@ -616,6 +635,10 @@ function iniciar() {
   comprobarNotificacionesIncapacidad();
   esperarFirebase();
 
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+  }
+
   if (window.innerWidth <= 768) {
     document.getElementById('sidebar').classList.remove('visibleMobile');
     document.getElementById('toggleSidebar').textContent = '›';
@@ -623,6 +646,13 @@ function iniciar() {
 
   setInterval(revisarNotificaciones, 5000);
   setInterval(actualizarTimersEnVivo, 1000);
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  mostrarToastUI(isDark ? 'Modo oscuro activado' : 'Modo claro activado');
 }
 
 function registrarServiceWorker() {
@@ -780,6 +810,7 @@ async function guardarNuevaTarea() {
   const hora = document.getElementById('nuevaHora').value;
   const tipo = document.getElementById('nuevoTipo').value;
   const prioridad = document.getElementById('nuevaPrioridad').value;
+  const tag = document.getElementById('nuevoTag').value.trim();
   const repeticion = document.getElementById('nuevaRepeticion').value;
   const repetirHasta = document.getElementById('nuevaRepetirHasta').value;
   const observacion = document.getElementById('nuevaObservacion').value.trim();
@@ -796,13 +827,14 @@ async function guardarNuevaTarea() {
       userId: currentUser.uid,
       creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: invitadoEmail,
-      tarea, fechaKey: fecha || '', hora: hora || '', tipo, prioridad, repeticion, repetirHasta: repetirHasta || '',
+      tarea, fechaKey: fecha || '', hora: hora || '', tipo, prioridad, tag, repeticion, repetirHasta: repetirHasta || '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
 
     document.getElementById('nuevaTarea').value = '';
     document.getElementById('nuevaHora').value = '';
+    document.getElementById('nuevoTag').value = '';
     document.getElementById('nuevaRepetirHasta').value = '';
     document.getElementById('nuevaObservacion').value = '';
     document.getElementById('nuevoInvitado').value = '';
@@ -823,7 +855,7 @@ async function guardarIdeaBuzon() {
       userId: currentUser.uid,
       creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: '',
-      tarea: texto, fechaKey: '', hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
+      tarea: texto, fechaKey: '', hora: '', tipo: 'Personal', prioridad: 'Media', tag: '', repeticion: 'Una vez', repetirHasta: '',
       observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
@@ -845,7 +877,7 @@ async function guardarTareaRapida() {
       userId: currentUser.uid,
       creadorEmail: (currentUser.email || '').toLowerCase(),
       invitadoEmail: '',
-      tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', repeticion: 'Una vez', repetirHasta: '',
+      tarea: texto, fechaKey: hoy, hora: '', tipo: 'Personal', prioridad: 'Media', tag: '', repeticion: 'Una vez', repetirHasta: '',
       observacion: '', estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       registrosTiempo: {}, timerInicio: null, timerFechaKey: null
     });
@@ -861,11 +893,11 @@ function obtenerSegundosDeFecha(tarea, fechaKey) {
   return Number(tarea.tiempoAcumuladoSec || 0);
 }
 
-async function marcarHecho(id) {
+async function marcarHecho(id, fechaEspecifica) {
   const t = tareas.find(x => x.id === id);
   if (!t) return;
 
-  const hoy = obtenerHoyKey();
+  const hoy = fechaEspecifica || obtenerHoyKey();
   const { doc, updateDoc } = window.fbFunctions;
 
   let registros = { ...(t.registrosTiempo || {}) };
@@ -1044,6 +1076,7 @@ async function guardarEdicionModal(modoRecurrencia) {
   const hora = document.getElementById('editHora').value;
   const tipo = document.getElementById('editTipo').value;
   const prioridad = document.getElementById('editPrioridad').value;
+  const tag = document.getElementById('editTag').value.trim();
   const repeticion = document.getElementById('editRepeticion').value;
   const observacion = document.getElementById('editObservacion').value.trim();
   const invitadoEmail = document.getElementById('editInvitado').value.trim().toLowerCase();
@@ -1058,7 +1091,7 @@ async function guardarEdicionModal(modoRecurrencia) {
       userId: currentUser.uid,
       creadorEmail: t.creadorEmail || (currentUser.email || '').toLowerCase(),
       invitadoEmail: invitadoEmail,
-      tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion: 'Una vez', repetirHasta: '',
+      tarea, fechaKey: fecha, hora, tipo, prioridad, tag, repeticion: 'Una vez', repetirHasta: '',
       observacion, estado: 'Pendiente', completadasFechas: [], posponerHasta: '', createdAt: Date.now(),
       registrosTiempo: t.registrosTiempo || {}, timerInicio: null
     });
@@ -1069,7 +1102,7 @@ async function guardarEdicionModal(modoRecurrencia) {
 
   } else {
     await updateDoc(doc(window.fbDb, "tareas", id), {
-      tarea, fechaKey: fecha, hora, tipo, prioridad, repeticion, observacion, invitadoEmail
+      tarea, fechaKey: fecha, hora, tipo, prioridad, tag, repeticion, observacion, invitadoEmail
     });
   }
 
@@ -1118,7 +1151,7 @@ function comprobarNotificacionesIncapacidad() {
     document.getElementById('btnNotif').style.display = 'none';
   } else if (Notification.permission === "granted") {
     notifPermiso = true;
-    document.getElementById('btnNotif').style.background = 'var(--v5)';
+    document.getElementById('btnNotif').style.color = 'var(--v5)';
   }
 }
 
@@ -1131,12 +1164,12 @@ function toggleNotificaciones() {
   Notification.requestPermission().then(function(permission) {
     if (permission === "granted") {
       notifPermiso = true;
-      document.getElementById('btnNotif').style.background = 'var(--v5)';
-      lanzarNotificacion("Clyppy", "¡Notificaciones activadas con éxito!");
+      document.getElementById('btnNotif').style.color = 'var(--v5)';
+      lanzarNotificacion("Clyppy", "Notificaciones activadas con éxito.");
       mostrarToastUI("Notificaciones activadas.");
     } else {
       notifPermiso = false;
-      document.getElementById('btnNotif').style.background = '#f0ebf8';
+      document.getElementById('btnNotif').style.color = 'rgba(255,255,255,0.5)';
       mostrarToastUI("Permiso denegado en el navegador.");
     }
   });
@@ -1163,7 +1196,7 @@ function revisarNotificaciones() {
       const keyNotif = `${t.id}_5min_${hoyStr}`;
       if (!notificados5MinMap[keyNotif]) {
         notificados5MinMap[keyNotif] = true;
-        lanzarNotificacion("Clyppy: Reunión en 5 minutos 📅", `${t.tarea} (${t.hora} hs)`);
+        lanzarNotificacion("Clyppy: Reunión en 5 minutos", `${t.tarea} (${t.hora} hs)`);
       }
     }
 
@@ -1171,7 +1204,7 @@ function revisarNotificaciones() {
       const keyNotif = `${t.id}_exacta_${hoyStr}`;
       if (!notificadosMap[keyNotif]) {
         notificadosMap[keyNotif] = true;
-        lanzarNotificacion("Clyppy: ¡Hora de tu tarea!", `${t.tarea}`);
+        lanzarNotificacion("Clyppy: Tarea de hoy", `${t.tarea}`);
       }
     }
   });
@@ -1294,6 +1327,16 @@ function estaTareaActivaEnFecha(t, fechaCelda, fechaKey) {
   return false;
 }
 
+function obtenerTareasAtrasadas() {
+  const hoy = obtenerHoyKey();
+  return tareas.filter(t => {
+    if (t.estado === 'Completada') return false;
+    if (!t.fechaKey) return false; 
+    if (t.repeticion && t.repeticion !== 'Una vez') return false; 
+    return t.fechaKey < hoy;
+  });
+}
+
 function actualizarUI() {
   actualizarContadores();
   actualizarProgreso();
@@ -1307,27 +1350,13 @@ function actualizarUI() {
 }
 
 function verificarTareasAtrasadas() {
-  const hoy = obtenerHoyKey();
-  const fechaHoyObj = new Date();
-  const ayerObj = new Date();
-  ayerObj.setDate(ayerObj.getDate() - 1);
-  const ayerKey = [ayerObj.getFullYear(), String(ayerObj.getMonth() + 1).padStart(2, '0'), String(ayerObj.getDate()).padStart(2, '0')].join('-');
-
-  let atrasadas = 0;
-  tareas.forEach(t => {
-    if (t.repeticion && t.repeticion !== 'Una vez') {
-      if (estaTareaActivaEnFecha(t, ayerObj, ayerKey) && !estaTareaCompletaEnFecha(t, ayerKey)) {
-        atrasadas++;
-      }
-    }
-  });
-
+  const atrasadas = obtenerTareasAtrasadas();
   const alertContainer = document.getElementById('alertaPendientesContainer');
-  if (atrasadas > 0 && seccionActual === 'hoy') {
+  if (atrasadas.length > 0 && seccionActual === 'hoy') {
     alertContainer.innerHTML = `
       <div class="alertaPendientes">
-        <span>⚠️ Tenés ${atrasadas} tarea(s) recurrente(s) de ayer sin marcar como hechas.</span>
-        <button onclick="mostrarSeccion('calendario')" style="background: #e65100; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Ver calendario</button>
+        <span>Tenés ${atrasadas.length} tarea(s) de días anteriores sin completar.</span>
+        <button onclick="mostrarSeccion('atrasadas')" style="background: #e65100; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 12px;">Revisar ahora</button>
       </div>
     `;
   } else {
@@ -1341,9 +1370,11 @@ function actualizarContadores() {
 
   const pendientesHoy = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
   const urgentesHoy = pendientesHoy.filter(t => String(t.prioridad || '').toLowerCase().includes('alta'));
+  const atrasadas = obtenerTareasAtrasadas();
 
   document.getElementById('total').textContent = pendientesHoy.length;
   document.getElementById('urgentes').textContent = urgentesHoy.length;
+  document.getElementById('numAtrasadas').textContent = atrasadas.length;
 }
 
 function actualizarProgreso() {
@@ -1382,7 +1413,7 @@ function mostrarSeccion(seccion) {
     document.getElementById('toggleSidebar').textContent = '›';
   }
 
-  const mapa = { hoy: 'menuHoy', buzon: 'menuBuzon', calendario: 'menuCalendario', estadisticas: 'menuEstadisticas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
+  const mapa = { hoy: 'menuHoy', atrasadas: 'menuAtrasadas', buzon: 'menuBuzon', calendario: 'menuCalendario', estadisticas: 'menuEstadisticas', buscar: 'menuBuscar', nueva: 'menuNueva', completadas: 'menuCompletadas', guia: 'menuGuia' };
   if (mapa[seccion]) document.getElementById(mapa[seccion]).classList.add('activo');
 
   document.getElementById('buscador').style.display = seccion === 'buscar' ? 'block' : 'none';
@@ -1393,10 +1424,10 @@ function mostrarSeccion(seccion) {
   document.getElementById('quickAdd').style.display = seccion === 'hoy' ? 'flex' : 'none';
   document.getElementById('quickAddBuzon').style.display = seccion === 'buzon' ? 'flex' : 'none';
   document.getElementById('progresoContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
-  document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas') ? 'grid' : 'none';
+  document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas' || seccion === 'atrasadas') ? 'grid' : 'none';
   document.getElementById('alertaPendientesContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', buzon: 'Buzón', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
+  const titulos = { hoy: 'Mis tareas', atrasadas: 'Tareas atrasadas por revisar', buzon: 'Buzón', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar tareas', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
@@ -1473,6 +1504,9 @@ function renderizarSegunSeccion() {
   if (seccionActual === 'hoy') {
     lista = tareas.filter(t => !estaTareaCompletaEnFecha(t, hoy) && estaTareaActivaEnFecha(t, fechaHoyObj, hoy));
     lista.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
+  } else if (seccionActual === 'atrasadas') {
+    lista = obtenerTareasAtrasadas();
+    lista.sort((a, b) => String(a.fechaKey).localeCompare(String(b.fechaKey)));
   } else if (seccionActual === 'buzon') {
     lista = tareas.filter(t => (!t.fechaKey || t.fechaKey === '') && t.estado !== 'Completada');
     lista.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -1488,9 +1522,10 @@ function renderizar(lista) {
   const contenedor = document.getElementById('lista');
   if (!lista || lista.length === 0) {
     let mensaje = 'No tenés tareas pendientes.';
+    if (seccionActual === 'atrasadas') mensaje = '¡Al día! No tenés tareas atrasadas.';
     if (seccionActual === 'buzon') mensaje = 'El buzón está vacío. ¡Anotá tus ideas rápido!';
     if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
-    if (seccionActual === 'buscar') mensaje = 'Ingresá un término o no se encontraron tareas.';
+    if (seccionActual === 'buscar') mensaje = 'Ingresá un término de búsqueda para encontrar tareas.';
     contenedor.innerHTML = `<div class="card">${mensaje}</div>`;
     return;
   }
@@ -1526,6 +1561,7 @@ function crearTarjeta(tarea) {
       <div class="info">
         <div class="hora">
           ${esModoBuzon ? 'Nota / Sin fecha' : escapar(tarea.hora || 'Sin horario')}
+          ${tarea.tag ? `<span class="badgeTag">#${escapar(tarea.tag)}</span>` : ''}
           ${tieneTiempo ? `<span class="badgeTiempo ${estaCorriendo ? 'corriendo' : ''}" id="timer-display-${tarea.id}">⏱️ ${formatearSegundos(segAcumulados)}</span>` : ''}
           ${estaPospuesta ? `<span class="tagPospuesta">Pospuesta hasta ${horaPospuesta} hs</span>` : ''}
           ${esInvitado ? `<span class="tagInvitado">Compartida por ${escapar(tarea.creadorEmail || 'un usuario')}</span>` : ''}
@@ -1534,17 +1570,17 @@ function crearTarjeta(tarea) {
         <div class="nombre" style="${estaHechaHoy ? 'text-decoration: line-through; opacity:0.6;' : ''}">${escapar(tarea.tarea)}</div>
         <div class="detalle">
           <span class="dotTipo ${tipoClase}"></span>
-          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
+          ${escapar(tarea.tipo || '')} ${tarea.prioridad ? ' · Prioridad: ' + escapar(tarea.prioridad) : ''} ${tarea.repeticion && tarea.repeticion !== 'Una vez' ? ' · Repite: ' + escapar(tarea.repeticion) : ''}
         </div>
         ${tarea.observacion ? `<div class="observacion">📝 <strong>Observaciones:</strong> ${escapar(tarea.observacion)}</div>` : ''}
         ${tarea.fechaKey ? `
-        <div>
-          <span class="${esModoBuscar ? 'fechaTareaResaltada' : 'fechaTarea'}">${escapar(tarea.fechaKey)}</span>
+        <div style="margin-top: 4px;">
+          <span style="font-size: 11px; color: var(--texto-secundario); font-weight: 600;">Fecha: ${escapar(tarea.fechaKey)}</span>
         </div>` : ''}
       </div>
       <div class="acciones" onclick="event.stopPropagation()">
         ${esModoBuzon ? `
-          <button class="btnProgramar" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">📅 Programar dia/hora</button>
+          <button class="btnProgramar" onclick="abrirModalEditar('${escaparJS(tarea.id)}')">Programar dia/hora</button>
           <button class="hecho" onclick="marcarHecho('${escaparJS(tarea.id)}')">Hecho</button>
         ` : ''}
         ${!esModoBuzon && !estaHechaHoy ? `
@@ -1604,17 +1640,14 @@ function renderizarCalendario() {
 
     const tareasDia = tareas.filter(t => estaTareaActivaEnFecha(t, fechaCelda, key));
 
-    html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}" onclick="crearTareaDesdeCalendario('${key}')"><div class="calNumero">${numero}</div>`;
+    html += `<div class="calCelda ${otroMes ? 'otroMes' : ''} ${key === hoy ? 'hoy' : ''}" onclick="abrirVerDiaModal('${key}')"><div class="calNumero">${numero}</div>`;
 
     tareasDia.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99'))).forEach(t => {
       const prioClase = 'p-' + String(t.prioridad || 'media').toLowerCase();
-      
-      let tipoLimpio = String(t.tipo || 'personal').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '');
-      const tipoClase = 'tipo-' + tipoLimpio;
       const estaCompletadaEnEseDia = estaTareaCompletaEnFecha(t, key);
 
       html += `
-        <div class="calTarea ${prioClase} ${tipoClase} ${estaCompletadaEnEseDia ? 'completada' : ''}" onclick="event.stopPropagation(); abrirModalEditar('${escaparJS(t.id)}')">
+        <div class="calTarea ${prioClase} ${estaCompletadaEnEseDia ? 'completada' : ''}" onclick="event.stopPropagation(); abrirModalEditar('${escaparJS(t.id)}')">
           ${escapar(t.tarea)}
         </div>
       `;
@@ -1622,6 +1655,52 @@ function renderizarCalendario() {
     html += `</div>`;
   }
   grid.innerHTML = html;
+}
+
+function abrirVerDiaModal(fechaKey) {
+  const partes = fechaKey.split('-');
+  const fObj = new Date(partes[0], partes[1] - 1, partes[2]);
+  const fechaFormateada = fObj.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('tituloModalVerDia').textContent = `Tareas del ${fechaFormateada}`;
+  
+  const tareasDia = tareas.filter(t => estaTareaActivaEnFecha(t, fObj, fechaKey));
+  tareasDia.sort((a, b) => String(a.hora || '99:99').localeCompare(String(b.hora || '99:99')));
+
+  const contenedor = document.getElementById('listaTareasDiaModal');
+  
+  if (tareasDia.length === 0) {
+    contenedor.innerHTML = `<div style="text-align:center; color: var(--texto-secundario); padding: 20px;">No hay tareas agendadas para este día.</div>`;
+  } else {
+    contenedor.innerHTML = tareasDia.map(t => {
+      const estaHecha = estaTareaCompletaEnFecha(t, fechaKey);
+      return `
+        <div style="background: var(--fondo); border-radius: 10px; padding: 12px; margin-bottom: 8px; border-left: 4px solid var(--v2); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--borde-color); border-right: 1px solid var(--borde-color); border-bottom: 1px solid var(--borde-color);">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--texto-secundario);">${escapar(t.hora || 'Sin horario')} ${t.tag ? `#${escapar(t.tag)}` : ''}</div>
+            <div style="font-size: 15px; font-weight: 600; ${estaHecha ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${escapar(t.tarea)}</div>
+            <div style="font-size: 11px; color: var(--texto-secundario);">${escapar(t.tipo || 'Personal')} · Prioridad: ${escapar(t.prioridad || 'Media')}</div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            ${!estaHecha ? `<button onclick="marcarHecho('${escaparJS(t.id)}', '${fechaKey}'); abrirVerDiaModal('${fechaKey}');" style="background: var(--v2); color: white; border: none; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer;">Hecho</button>` : '<span style="font-size: 12px; color: green; font-weight: 600;">✓ Listo</span>'}
+            <button onclick="cerrarModalVerDia(); abrirModalEditar('${escaparJS(t.id)}');" style="background: var(--v5); border: none; border-radius: 6px; padding: 6px 8px; font-size: 12px; cursor: pointer;">✏️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const btnAgregar = document.getElementById('btnAgregarTareaAEsteDia');
+  btnAgregar.onclick = () => {
+    cerrarModalVerDia();
+    crearTareaDesdeCalendario(fechaKey);
+  };
+
+  document.getElementById('modalVerDia').classList.add('activo');
+}
+
+function cerrarModalVerDia() {
+  document.getElementById('modalVerDia').classList.remove('activo');
 }
 
 function crearTareaDesdeCalendario(fechaStr) {
@@ -1635,10 +1714,10 @@ function irAMesActual() { calendarioFecha = new Date(); renderizarCalendario(); 
 function buscarTareas() {
   const texto = document.getElementById('inputBuscar').value.toLowerCase().trim();
   if (texto === '') { 
-    renderizar(tareas); 
+    renderizar([]); 
     return; 
   }
-  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.repeticion, t.estado, t.fechaKey, t.invitadoEmail, t.observacion].join(' ').toLowerCase().includes(texto));
+  const resultados = tareas.filter(t => [t.tarea, t.tipo, t.prioridad, t.tag, t.repeticion, t.estado, t.fechaKey, t.invitadoEmail, t.observacion].join(' ').toLowerCase().includes(texto));
   renderizar(resultados);
 }
 
@@ -1653,6 +1732,7 @@ function abrirModalEditar(id) {
   document.getElementById('editHora').value = t.hora || '';
   document.getElementById('editTipo').value = t.tipo || 'Personal';
   document.getElementById('editPrioridad').value = t.prioridad || 'Media';
+  document.getElementById('editTag').value = t.tag || '';
   document.getElementById('editRepeticion').value = t.repeticion || 'Una vez';
   document.getElementById('editObservacion').value = t.observacion || '';
   document.getElementById('editInvitado').value = t.invitadoEmail || '';
