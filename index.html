@@ -333,7 +333,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
   <div class="menu">
     <button id="menuHoy" class="activo" onclick="mostrarSeccion('hoy')">Hoy</button>
-    <button id="menuAtrasadas" onclick="mostrarSeccion('atrasadas')">Atrasadas / Por revisar</button>
+    <button id="menuAtrasadas" onclick="mostrarSeccion('atrasadas')">Por revisar</button>
     <button id="menuBuzon" onclick="mostrarSeccion('buzon')">Buzón</button>
     <button id="menuCalendario" onclick="mostrarSeccion('calendario')">Calendario</button>
     <button id="menuEstadisticas" onclick="mostrarSeccion('estadisticas')">Estadísticas</button>
@@ -371,7 +371,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
 
     <div id="resumenGrid" class="resumen">
       <div class="card" onclick="mostrarSeccion('hoy')"><div class="numero" id="total">0</div><div class="titulo">Pendientes hoy</div></div>
-      <div class="card" onclick="mostrarSeccion('atrasadas')"><div class="numero" id="numAtrasadas">0</div><div class="titulo">Atrasadas</div></div>
+      <div class="card" onclick="mostrarSeccion('atrasadas')"><div class="numero" id="numAtrasadas">0</div><div class="titulo">Por revisar</div></div>
       <div class="card" onclick="filtrarAltaPrioridad()"><div class="numero" id="urgentes">0</div><div class="titulo">Alta prioridad</div></div>
     </div>
 
@@ -460,7 +460,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     </div>
 
     <div id="estadisticasSection" class="statsContainer" style="display:none;">
-      <h2>Análisis de tiempo y productividad 📊</h2>
+      <h2>Análisis de tiempo y productividad</h2>
       <div class="statsGrid">
         <div class="statBox">
           <div class="statNum" id="statTiempoHoy">0m</div>
@@ -483,7 +483,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
     </div>
 
     <div id="guiaSection" class="guiaContainer" style="display:none;">
-      <h2>Guía de uso de Clyppy 📎</h2>
+      <h2>Guía de uso de Clyppy</h2>
       
       <div class="guiaItem">
         <div class="guiaTitulo">Buzón de notas y pendientes</div>
@@ -491,7 +491,7 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Robo
       </div>
 
       <div class="guiaItem">
-        <div class="guiaTitulo">Atrasadas / Por revisar</div>
+        <div class="guiaTitulo">Por revisar</div>
         <div class="guiaTexto">Las tareas de días anteriores que no marcaste como completadas quedarán en esta sección para que no las olvides ni se te pierdan.</div>
       </div>
 
@@ -1427,7 +1427,7 @@ function mostrarSeccion(seccion) {
   document.getElementById('resumenGrid').style.display = (seccion === 'hoy' || seccion === 'completadas' || seccion === 'atrasadas') ? 'grid' : 'none';
   document.getElementById('alertaPendientesContainer').style.display = seccion === 'hoy' ? 'block' : 'none';
 
-  const titulos = { hoy: 'Mis tareas', atrasadas: 'Tareas atrasadas por revisar', buzon: 'Buzón', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar tareas', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
+  const titulos = { hoy: 'Mis tareas', atrasadas: 'Por revisar', buzon: 'Buzón', calendario: 'Calendario', estadisticas: 'Estadísticas', buscar: 'Buscar tareas', nueva: 'Nueva tarea', completadas: 'Completadas', guia: 'Cómo usar Clyppy' };
   document.getElementById('tituloHeader').textContent = titulos[seccion];
 
   if (seccion === 'calendario') renderizarCalendario();
@@ -1522,7 +1522,7 @@ function renderizar(lista) {
   const contenedor = document.getElementById('lista');
   if (!lista || lista.length === 0) {
     let mensaje = 'No tenés tareas pendientes.';
-    if (seccionActual === 'atrasadas') mensaje = '¡Al día! No tenés tareas atrasadas.';
+    if (seccionActual === 'atrasadas') mensaje = '¡Al día! No tenés tareas pendientes por revisar.';
     if (seccionActual === 'buzon') mensaje = 'El buzón está vacío. ¡Anotá tus ideas rápido!';
     if (seccionActual === 'completadas') mensaje = 'No hay tareas completadas.';
     if (seccionActual === 'buscar') mensaje = 'Ingresá un término de búsqueda para encontrar tareas.';
